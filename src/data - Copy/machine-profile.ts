@@ -1,0 +1,22 @@
+export const MachineProfile = [
+  {
+    id: 1,
+    objecstatus: "O",
+    description: "Komatsu Loader 50 Ton",
+    registerddate: "2024-05-01 00:00:00.0",
+    registeredno: "TPSD-JU-020323",
+    regiteredeby: "HO",
+    countryoforigin: "JPN",
+    dob: "2021-10-20 00:00:00.0",
+    sex: "M",
+    documentno: "DO-2484k-032834",
+    vendor: "KOMATSU JPN, CO. LTD",
+    notes: "-",
+    photogalery_1: "1.jog",
+    photogalery_2: "2.jpg",
+    photogalery_3: "3.jpg",
+    photogalery_4: "4.jpg",
+    photogalery_5: "5.jpg",
+    video: "km.mp3",
+  },
+];
