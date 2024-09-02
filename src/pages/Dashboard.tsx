@@ -159,14 +159,18 @@ export default function Dashboard() {
 
   return (
     <div>
-      <Chart/>
-      <FilterDropdowns
-        uniqueValues={uniqueValues}
-        selectedFilters={selectedFilters}
-        handleFilterChange={handleFilterChange}
-        fieldLabels={fieldLabels}
-      />
-      <ProductivityTable filteredData={filteredData} />
+      <div className="w-full h-svh flex flex-col justify-center items-center">
+        <Chart />
+      </div>
+      <div className="w-full h-svh flex flex-col justify-center items-center">
+        <FilterDropdowns
+          uniqueValues={uniqueValues}
+          selectedFilters={selectedFilters}
+          handleFilterChange={handleFilterChange}
+          fieldLabels={fieldLabels}
+        />
+        <ProductivityTable filteredData={filteredData} />
+      </div>
     </div>
   );
 }
