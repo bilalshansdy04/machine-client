@@ -1,9 +1,6 @@
-import { useState, useMemo } from "react";
-import { machineProductivity } from "@/data/machine-productivity";
-import { MachineType } from "@/data/machine-type";
-import { MachineId } from "@/data/machine-id";
-import { MachineGroup } from "@/data/machine-group";
-import { MachineDetail } from "@/data/machine-detail";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import CryptoJS from "crypto-js"; // Pastikan CryptoJS sudah terpasang
 import { FilterDropdowns } from "@/components/dashboard-component/FilterDropdowns";
 import { ProductivityTable } from "@/components/dashboard-component/ProductivityTable";
 import Chart from "@/components/dashboard-component/Chart";
@@ -23,126 +20,111 @@ export interface MachineProductivity {
   objectstatus: string;
 }
 
-// Mapping field names to labels
+const API_URL = "http://localhost:3000/api/machineproductivity";
+const SECRET_KEY = "A9CCF340D9A490104AC5159B8E1CBXXX";
+const IV = "JFKlnUZyyu0MzRqj";
+
+// Definisikan fieldLabels untuk memberikan label yang lebih jelas pada kolom-kolom tabel
 const fieldLabels: { [key in keyof MachineProductivity]: string } = {
+  id: "No",
   objecttype_id: "Object Type",
-  objectid_id: "Object ID",
   objectgroup_id: "Object Group",
+  objectid_id: "Object ID",
   objectcode_id: "Object Code",
   outputcapacity: "Output Capacity",
-  startdate: "Start Date",
-  enddate: "End Date",
-  objectstatus: "Status",
   outputuom: "Output UOM",
   outputtime: "Output Time",
   outputcost: "Output Cost",
-  id: "No",
-};
-
-const getUniqueValues = (
-  data: MachineProductivity[],
-  field: keyof MachineProductivity
-): string[] => {
-  const values = data.map((item) => item[field]?.toString());
-  return Array.from(new Set(values));
-};
-
-const getUniqueObjectTypes = (data: MachineProductivity[]): string[] => {
-  const objectTypes = data.map(
-    (item) =>
-      MachineType.find((m) => m.id === item.objecttype_id)?.objecttype || ""
-  );
-  return Array.from(new Set(objectTypes));
-};
-const getUniqueObjectId = (data: MachineProductivity[]): string[] => {
-  const ObjectId = data.map(
-    (item) => MachineId.find((m) => m.id === item.objectid_id)?.objectid || ""
-  );
-  return Array.from(new Set(ObjectId));
-};
-
-const getUniqueObjectGroup = (data: MachineProductivity[]): string[] => {
-  const ObjectGroup = data.map(
-    (item) =>
-      MachineGroup.find((m) => m.id === item.objectgroup_id)?.objectgroup || ""
-  );
-  return Array.from(new Set(ObjectGroup));
-};
-
-const getUniqueObjectCode = (data: MachineProductivity[]): string[] => {
-  const ObjectCode = data.map(
-    (item) =>
-      MachineDetail.find((m) => m.id === item.objectcode_id)?.objectcode || ""
-  );
-  return Array.from(new Set(ObjectCode));
+  startdate: "Start Date",
+  enddate: "End Date",
+  objectstatus: "Status",
 };
 
 export default function Dashboard() {
   const [selectedFilters, setSelectedFilters] = useState<
     Partial<Record<keyof MachineProductivity, string>>
   >({});
+  const [apiData, setApiData] = useState<MachineProductivity[]>([]);
 
-  const uniqueValues: Record<keyof MachineProductivity, string[]> = {
-    startdate: useMemo(
-      () => ["All Dates", ...getUniqueValues(machineProductivity, "startdate")],
-      []
-    ),
-    objecttype_id: useMemo(
-      () => ["All Types", ...getUniqueObjectTypes(machineProductivity)],
-      []
-    ),
-    objectid_id: useMemo(
-      () => ["All IDs", ...getUniqueObjectId(machineProductivity)],
-      []
-    ),
-    objectgroup_id: useMemo(
-      () => ["All Groups", ...getUniqueObjectGroup(machineProductivity)],
-      []
-    ),
-    objectcode_id: useMemo(
-      () => ["All Codes", ...getUniqueObjectCode(machineProductivity)],
-      []
-    ),
-    outputcapacity: useMemo(
-      () => [
-        "All Capacities",
-        ...getUniqueValues(machineProductivity, "outputcapacity"),
-      ],
-      []
-    ),
+  const encryptData = (data: object) => {
+    const jsonString = JSON.stringify(data);
+    const encrypted = CryptoJS.AES.encrypt(jsonString, CryptoJS.enc.Utf8.parse(SECRET_KEY), {
+      iv: CryptoJS.enc.Utf8.parse(IV),
+      mode: CryptoJS.mode.CBC,
+      padding: CryptoJS.pad.Pkcs7,
+    }).ciphertext.toString(CryptoJS.enc.Hex).toUpperCase();
+
+    return encrypted;
   };
 
-  const filteredData = machineProductivity.filter((item) => {
+  const decryptData = (encryptedMessage: string) => {
+    const decryptedBytes = CryptoJS.AES.decrypt(encryptedMessage, CryptoJS.enc.Utf8.parse(SECRET_KEY), {
+      iv: CryptoJS.enc.Utf8.parse(IV),
+      mode: CryptoJS.mode.CBC,
+      padding: CryptoJS.pad.Pkcs7,
+    });
+    const decryptedText = decryptedBytes.toString(CryptoJS.enc.Utf8);
+    return JSON.parse(decryptedText);
+  };
+
+  const fetchData = async () => {
+    const payload = {
+      apikey: "06EAAA9D10BE3D4386D10144E267B681",
+      uniqueid: IV,
+      timestamp: new Date().toISOString().replace(/[-:.TZ]/g, ""),
+      localdb: "N",
+      message: encryptData({
+        datacore: "MACHINE",
+        folder: "MACHINEPRODUCTIVITY",
+        command: "SELECT",
+        group: "XCYTUA",
+        property: "PJLBBS",
+        fields: "*", // Ubah sesuai permintaan
+        pageno: "0",
+        recordperpage: "5", // Ubah sesuai permintaan
+        condition: {
+          objectstatus: {
+            operator: "eq",
+            value: "O",
+          },
+        },
+      }),
+    };
+
+    try {
+      const response = await axios.post(API_URL, payload, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.data.code === 200) {
+        const decryptedMessage = decryptData(response.data.message);
+        setApiData(decryptedMessage);
+      } else {
+        console.error("Failed to fetch data from API", response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const uniqueValues: Record<keyof MachineProductivity, string[]> = {
+    startdate: ["All Dates", ...getUniqueValues(apiData, "startdate")],
+    objecttype_id: ["All Types", ...getUniqueObjectValues(apiData, "objecttype_id")],
+    objectid_id: ["All IDs", ...getUniqueObjectValues(apiData, "objectid_id")],
+    objectgroup_id: ["All Groups", ...getUniqueObjectValues(apiData, "objectgroup_id")],
+    objectcode_id: ["All Codes", ...getUniqueObjectValues(apiData, "objectcode_id")],
+    outputcapacity: ["All Capacities", ...getUniqueValues(apiData, "outputcapacity")],
+  };
+
+  const filteredData = apiData.filter((item) => {
     return Object.entries(selectedFilters).every(([field, value]) => {
       if (value === "" || value.startsWith("All")) return true;
-
-      if (field === "objecttype_id") {
-        return (
-          MachineType.find((m) => m.id === item.objecttype_id)?.objecttype ===
-          value
-        );
-      }
-
-      if (field === "objectid_id") {
-        return (
-          MachineId.find((m) => m.id === item.objectid_id)?.objectid === value
-        );
-      }
-
-      if (field === "objectgroup_id") {
-        return (
-          MachineGroup.find((m) => m.id === item.objectgroup_id)
-            ?.objectgroup === value
-        );
-      }
-
-      if (field === "objectcode_id") {
-        return (
-          MachineDetail.find((m) => m.id === item.objectcode_id)?.objectcode ===
-          value
-        );
-      }
-
       return item[field as keyof MachineProductivity]?.toString() === value;
     });
   });
@@ -167,10 +149,28 @@ export default function Dashboard() {
           uniqueValues={uniqueValues}
           selectedFilters={selectedFilters}
           handleFilterChange={handleFilterChange}
-          fieldLabels={fieldLabels}
+          fieldLabels={fieldLabels} // Memastikan fieldLabels terdefinisi
         />
         <ProductivityTable filteredData={filteredData} />
       </div>
     </div>
   );
 }
+
+// Fungsi untuk mendapatkan nilai unik dari field tertentu dalam data
+const getUniqueValues = (
+  data: MachineProductivity[],
+  field: keyof MachineProductivity
+): string[] => {
+  const values = data.map((item) => item[field]?.toString());
+  return Array.from(new Set(values));
+};
+
+// Fungsi untuk mendapatkan nilai unik dari objek berdasarkan ID atau lainnya
+const getUniqueObjectValues = (
+  data: MachineProductivity[],
+  field: keyof MachineProductivity
+): string[] => {
+  const values = data.map((item) => item[field]?.toString());
+  return Array.from(new Set(values));
+};
