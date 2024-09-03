@@ -20,16 +20,18 @@ export interface MachineProductivity {
   objectstatus: string;
 }
 
-// Mapping field names to labels
+const API_URL = "http://localhost:3000/api/machineproductivity";
+const SECRET_KEY = "A9CCF340D9A490104AC5159B8E1CBXXX";
+const IV = "JFKlnUZyyu0MzRqj";
+
+// Definisikan fieldLabels untuk memberikan label yang lebih jelas pada kolom-kolom tabel
 const fieldLabels: { [key in keyof MachineProductivity]: string } = {
+  id: "No",
   objecttype_id: "Object Type",
-  objectid_id: "Object ID",
   objectgroup_id: "Object Group",
+  objectid_id: "Object ID",
   objectcode_id: "Object Code",
   outputcapacity: "Output Capacity",
-  startdate: "Start Date",
-  enddate: "End Date",
-  objectstatus: "Status",
   outputuom: "Output UOM",
   outputtime: "Output Time",
   outputcost: "Output Cost",
@@ -189,7 +191,7 @@ export default function Dashboard() {
           uniqueValues={uniqueValues} // Menggunakan uniqueValues yang didefinisikan di atas
           selectedFilters={selectedFilters}
           handleFilterChange={handleFilterChange}
-          fieldLabels={fieldLabels}
+          fieldLabels={fieldLabels} // Memastikan fieldLabels terdefinisi
         />
         {/* Hanya gunakan apiData */}
         <ProductivityTable filteredData={filteredData} />
@@ -197,3 +199,21 @@ export default function Dashboard() {
     </div>
   );
 }
+
+// Fungsi untuk mendapatkan nilai unik dari field tertentu dalam data
+const getUniqueValues = (
+  data: MachineProductivity[],
+  field: keyof MachineProductivity
+): string[] => {
+  const values = data.map((item) => item[field]?.toString());
+  return Array.from(new Set(values));
+};
+
+// Fungsi untuk mendapatkan nilai unik dari objek berdasarkan ID atau lainnya
+const getUniqueObjectValues = (
+  data: MachineProductivity[],
+  field: keyof MachineProductivity
+): string[] => {
+  const values = data.map((item) => item[field]?.toString());
+  return Array.from(new Set(values));
+};
