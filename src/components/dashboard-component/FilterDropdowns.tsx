@@ -12,13 +12,33 @@ import { MachineProductivity } from "../../pages/Dashboard";
 
 interface FilterDropdownsProps {
   uniqueValues: {
-    [key in keyof Omit<MachineProductivity, 'outputtime' | 'outputcost' | 'startdate' | 'enddate' | 'objectstatus'>]: string[];
+    [key in keyof Omit<
+      MachineProductivity,
+      "outputtime" | "outputcost" | "startdate" | "enddate" | "objectstatus"
+    >]: string[];
   };
   selectedFilters: Partial<
-    Record<keyof Omit<MachineProductivity, 'outputtime' | 'outputcost' | 'startdate' | 'enddate' | 'objectstatus'>, string>
+    Record<
+      keyof Omit<
+        MachineProductivity,
+        "outputtime" | "outputcost" | "startdate" | "enddate" | "objectstatus"
+      >,
+      string
+    >
   >;
-  handleFilterChange: (field: keyof Omit<MachineProductivity, 'outputtime' | 'outputcost' | 'startdate' | 'enddate' | 'objectstatus'>, value: string) => void;
-  fieldLabels: { [key in keyof Omit<MachineProductivity, 'outputtime' | 'outputcost' | 'startdate' | 'enddate' | 'objectstatus'>]: string };
+  handleFilterChange: (
+    field: keyof Omit<
+      MachineProductivity,
+      "outputtime" | "outputcost" | "startdate" | "enddate" | "objectstatus"
+    >,
+    value: string
+  ) => void;
+  fieldLabels: {
+    [key in keyof Omit<
+      MachineProductivity,
+      "outputtime" | "outputcost" | "startdate" | "enddate" | "objectstatus"
+    >]: string;
+  };
 }
 
 export const FilterDropdowns: React.FC<FilterDropdownsProps> = ({
@@ -33,18 +53,63 @@ export const FilterDropdowns: React.FC<FilterDropdownsProps> = ({
         <DropdownMenu key={field}>
           <DropdownMenuTrigger asChild>
             <Button variant="outline">
-              Filter by {fieldLabels[field as keyof Omit<MachineProductivity, 'outputtime' | 'outputcost' | 'startdate' | 'enddate' | 'objectstatus'>]}
+              Filter by{" "}
+              {
+                fieldLabels[
+                  field as keyof Omit<
+                    MachineProductivity,
+                    | "outputtime"
+                    | "outputcost"
+                    | "startdate"
+                    | "enddate"
+                    | "objectstatus"
+                  >
+                ]
+              }
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56">
+          <DropdownMenuContent className="w-56 max-h-52 overflow-y-auto">
             <DropdownMenuLabel>
-              Select {fieldLabels[field as keyof Omit<MachineProductivity, 'outputtime' | 'outputcost' | 'startdate' | 'enddate' | 'objectstatus'>]}
+              Select{" "}
+              {
+                fieldLabels[
+                  field as keyof Omit<
+                    MachineProductivity,
+                    | "outputtime"
+                    | "outputcost"
+                    | "startdate"
+                    | "enddate"
+                    | "objectstatus"
+                  >
+                ]
+              }
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuRadioGroup
-              value={selectedFilters[field as keyof Omit<MachineProductivity, 'outputtime' | 'outputcost' | 'startdate' | 'enddate' | 'objectstatus'>] || ""}
+              value={
+                selectedFilters[
+                  field as keyof Omit<
+                    MachineProductivity,
+                    | "outputtime"
+                    | "outputcost"
+                    | "startdate"
+                    | "enddate"
+                    | "objectstatus"
+                  >
+                ] || ""
+              }
               onValueChange={(value) =>
-                handleFilterChange(field as keyof Omit<MachineProductivity, 'outputtime' | 'outputcost' | 'startdate' | 'enddate' | 'objectstatus'>, value)
+                handleFilterChange(
+                  field as keyof Omit<
+                    MachineProductivity,
+                    | "outputtime"
+                    | "outputcost"
+                    | "startdate"
+                    | "enddate"
+                    | "objectstatus"
+                  >,
+                  value
+                )
               }
             >
               {uniqueValues[field as keyof typeof uniqueValues].map((val) => (
