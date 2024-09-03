@@ -50,7 +50,7 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <div>
-        <Navbar />
+        {/* <Navbar /> */}
         <div className="px-36 pt-8">
           <RouterProvider router={router} />
         </div>

@@ -1,9 +1,6 @@
-import { useState, useMemo } from "react";
-import { machineProductivity } from "@/data/machine-productivity";
-import { MachineType } from "@/data/machine-type";
-import { MachineId } from "@/data/machine-id";
-import { MachineGroup } from "@/data/machine-group";
-import { MachineDetail } from "@/data/machine-detail";
+import { useState, useMemo, useEffect } from "react";
+import axios from "axios";
+import CryptoJS from "crypto-js";
 import { FilterDropdowns } from "@/components/dashboard-component/FilterDropdowns";
 import { ProductivityTable } from "@/components/dashboard-component/ProductivityTable";
 import Chart from "@/components/dashboard-component/Chart";
@@ -39,113 +36,131 @@ const fieldLabels: { [key in keyof MachineProductivity]: string } = {
   id: "No",
 };
 
+// Fungsi untuk mengenkripsi pesan
+const encryptMessage = (message: string, secretKey: string, iv: string): string => {
+  const key = CryptoJS.enc.Hex.parse(secretKey);
+  const ivHex = CryptoJS.enc.Hex.parse(iv);
+  const encrypted = CryptoJS.AES.encrypt(message, key, {
+    iv: ivHex,
+    mode: CryptoJS.mode.CBC,
+    padding: CryptoJS.pad.Pkcs7,
+  });
+  return encrypted.ciphertext.toString(CryptoJS.enc.Hex).toUpperCase(); // Mengubah hasil enkripsi menjadi kapital
+};
+
+// Fungsi untuk mendekripsi pesan
+const decryptMessage = (encryptedMessage: string, secretKey: string, iv: string): string => {
+  const key = CryptoJS.enc.Hex.parse(secretKey);
+  const ivHex = CryptoJS.enc.Hex.parse(iv);
+  const encrypted = CryptoJS.enc.Hex.parse(encryptedMessage);
+  const decrypted = CryptoJS.AES.decrypt({ ciphertext: encrypted }, key, {
+    iv: ivHex,
+    mode: CryptoJS.mode.CBC,
+    padding: CryptoJS.pad.Pkcs7,
+  });
+  return decrypted.toString(CryptoJS.enc.Utf8);
+};
+
+// Fungsi untuk mendapatkan nilai unik dari apiData
 const getUniqueValues = (
   data: MachineProductivity[],
   field: keyof MachineProductivity
 ): string[] => {
-  const values = data.map((item) => item[field]?.toString());
+  const values = data.map((item) => item[field]?.toString() ?? "");
   return Array.from(new Set(values));
-};
-
-const getUniqueObjectTypes = (data: MachineProductivity[]): string[] => {
-  const objectTypes = data.map(
-    (item) =>
-      MachineType.find((m) => m.id === item.objecttype_id)?.objecttype || ""
-  );
-  return Array.from(new Set(objectTypes));
-};
-const getUniqueObjectId = (data: MachineProductivity[]): string[] => {
-  const ObjectId = data.map(
-    (item) => MachineId.find((m) => m.id === item.objectid_id)?.objectid || ""
-  );
-  return Array.from(new Set(ObjectId));
-};
-
-const getUniqueObjectGroup = (data: MachineProductivity[]): string[] => {
-  const ObjectGroup = data.map(
-    (item) =>
-      MachineGroup.find((m) => m.id === item.objectgroup_id)?.objectgroup || ""
-  );
-  return Array.from(new Set(ObjectGroup));
-};
-
-const getUniqueObjectCode = (data: MachineProductivity[]): string[] => {
-  const ObjectCode = data.map(
-    (item) =>
-      MachineDetail.find((m) => m.id === item.objectcode_id)?.objectcode || ""
-  );
-  return Array.from(new Set(ObjectCode));
 };
 
 export default function Dashboard() {
   const [selectedFilters, setSelectedFilters] = useState<
     Partial<Record<keyof MachineProductivity, string>>
   >({});
+  const [apiData, setApiData] = useState<MachineProductivity[]>([]);
 
-  const uniqueValues: Record<keyof MachineProductivity, string[]> = {
-    startdate: useMemo(
-      () => ["All Dates", ...getUniqueValues(machineProductivity, "startdate")],
-      []
-    ),
-    objecttype_id: useMemo(
-      () => ["All Types", ...getUniqueObjectTypes(machineProductivity)],
-      []
-    ),
-    objectid_id: useMemo(
-      () => ["All IDs", ...getUniqueObjectId(machineProductivity)],
-      []
-    ),
-    objectgroup_id: useMemo(
-      () => ["All Groups", ...getUniqueObjectGroup(machineProductivity)],
-      []
-    ),
-    objectcode_id: useMemo(
-      () => ["All Codes", ...getUniqueObjectCode(machineProductivity)],
-      []
-    ),
-    outputcapacity: useMemo(
-      () => [
-        "All Capacities",
-        ...getUniqueValues(machineProductivity, "outputcapacity"),
-      ],
-      []
-    ),
-  };
+  // Mengambil variabel dari .env
+  const apiKey = import.meta.env.VITE_API_KEY as string;
+  const secretKey = import.meta.env.VITE_SECRET_KEY as string;
+  const iv = import.meta.env.VITE_IV as string;
+  const apiUrl = import.meta.env.VITE_API_URL as string;
 
-  const filteredData = machineProductivity.filter((item) => {
-    return Object.entries(selectedFilters).every(([field, value]) => {
-      if (value === "" || value.startsWith("All")) return true;
+  // Definisikan uniqueValues di sini berdasarkan apiData
+  const uniqueValues: Record<keyof MachineProductivity, string[]> = useMemo(() => {
+    return {
+      startdate: ["All Dates", ...getUniqueValues(apiData, "startdate")],
+      objecttype_id: ["All Types", ...getUniqueValues(apiData, "objecttype_id")],
+      objectid_id: ["All IDs", ...getUniqueValues(apiData, "objectid_id")],
+      objectgroup_id: ["All Groups", ...getUniqueValues(apiData, "objectgroup_id")],
+      objectcode_id: ["All Codes", ...getUniqueValues(apiData, "objectcode_id")],
+      outputcapacity: ["All Capacities", ...getUniqueValues(apiData, "outputcapacity")],
+      outputcost: ["All Costs", ...getUniqueValues(apiData, "outputcost")],
+      outputuom: ["All UOM", ...getUniqueValues(apiData, "outputuom")],
+      outputtime: ["All Time", ...getUniqueValues(apiData, "outputtime")],
+      enddate: ["All Dates", ...getUniqueValues(apiData, "enddate")],
+      objectstatus: ["All Status", ...getUniqueValues(apiData, "objectstatus")],
+      id: [],
+    };
+  }, [apiData]);
 
-      if (field === "objecttype_id") {
-        return (
-          MachineType.find((m) => m.id === item.objecttype_id)?.objecttype ===
-          value
-        );
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const jsonData = JSON.stringify({
+          datacore: "MACHINE",
+          folder: "MACHINEPRODUCTIVITY",
+          command: "SELECT",
+          group: "XCYTUA",
+          property: "PJLBBS",
+          fields: "*",
+          recordperpage: "5",
+          condition: {
+            objectstatus: {
+              operator: "eq",
+              value: "O",
+            },
+          },
+        });
+
+        // Encrypt the message
+        const encryptedMessage = encryptMessage(jsonData, secretKey, iv);
+
+        // Log the encrypted message
+        console.log("Encrypted Message:", encryptedMessage);
+
+        // Siapkan payload untuk permintaan API
+        const payload = {
+          apikey: apiKey,
+          uniqueid: iv,
+          timestamp: new Date().toISOString(),
+          localdb: "N",
+          message: encryptedMessage,
+        };
+
+        // Mengirim permintaan POST ke backend menggunakan Axios
+        const response = await axios.post(apiUrl, payload, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        console.log("Response from API:", response.data);
+
+        // Mendekripsi respons
+        const decryptedData = decryptMessage(response.data.message, secretKey, iv);
+        console.log("Decrypted data:", decryptedData);
+
+        // Validasi apakah data yang didekripsi adalah JSON yang valid
+        const parsedData: MachineProductivity[] = JSON.parse(decryptedData);
+        if (Array.isArray(parsedData)) {
+          setApiData(parsedData);
+        } else {
+          console.error("Decrypted data is not an array:", parsedData);
+        }
+      } catch (error) {
+        console.error("Error fetching or processing API data:", error);
       }
+    };
 
-      if (field === "objectid_id") {
-        return (
-          MachineId.find((m) => m.id === item.objectid_id)?.objectid === value
-        );
-      }
-
-      if (field === "objectgroup_id") {
-        return (
-          MachineGroup.find((m) => m.id === item.objectgroup_id)
-            ?.objectgroup === value
-        );
-      }
-
-      if (field === "objectcode_id") {
-        return (
-          MachineDetail.find((m) => m.id === item.objectcode_id)?.objectcode ===
-          value
-        );
-      }
-
-      return item[field as keyof MachineProductivity]?.toString() === value;
-    });
-  });
+    fetchData();
+  }, [apiKey, secretKey, iv, apiUrl]);
 
   const handleFilterChange = (
     field: keyof MachineProductivity,
@@ -157,6 +172,13 @@ export default function Dashboard() {
     }));
   };
 
+  const filteredData = apiData.filter((item) => {
+    return Object.entries(selectedFilters).every(([field, value]) => {
+      if (value === "" || value.startsWith("All")) return true;
+      return item[field as keyof MachineProductivity]?.toString() === value;
+    });
+  });
+
   return (
     <div>
       <div className="w-full h-svh flex flex-col justify-center items-center">
@@ -164,11 +186,12 @@ export default function Dashboard() {
       </div>
       <div className="w-full h-svh flex flex-col justify-center items-center">
         <FilterDropdowns
-          uniqueValues={uniqueValues}
+          uniqueValues={uniqueValues} // Menggunakan uniqueValues yang didefinisikan di atas
           selectedFilters={selectedFilters}
           handleFilterChange={handleFilterChange}
           fieldLabels={fieldLabels}
         />
+        {/* Hanya gunakan apiData */}
         <ProductivityTable filteredData={filteredData} />
       </div>
     </div>
