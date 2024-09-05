@@ -8,10 +8,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { MachineProductivity } from "../../pages/Dashboard";
-import { MachineType } from "../../data/machine-type.ts";
-import { MachineId } from "../../data/machine-id.ts";
-import { MachineGroup } from "../../data/machine-group.ts";
-import { MachineDetail } from "../../data/machine-detail.ts";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { Input } from "../ui/input.tsx";
@@ -42,18 +38,10 @@ export const ProductivityTable: React.FC<ProductivityTableProps> = ({
   const filteredAndSearchedData = filteredData.filter((productivity) => {
     const searchInLower = confirmedSearchTerm.toLowerCase();
     return (
-      MachineType.find((m) => m.id === productivity.objecttype_id)
-        ?.objecttype.toLowerCase()
-        .includes(searchInLower) ||
-      MachineId.find((m) => m.id === productivity.objectid_id)
-        ?.objectid.toLowerCase()
-        .includes(searchInLower) ||
-      MachineGroup.find((m) => m.id === productivity.objectgroup_id)
-        ?.objectgroup.toLowerCase()
-        .includes(searchInLower) ||
-      MachineDetail.find((m) => m.id === productivity.objectcode_id)
-        ?.objectcode.toLowerCase()
-        .includes(searchInLower) ||
+      productivity.objecttype.toLowerCase().includes(searchInLower) ||
+      productivity.objectid.toLowerCase().includes(searchInLower) ||
+      productivity.objectgroup.toLowerCase().includes(searchInLower) ||
+      productivity.objectcode.toLowerCase().includes(searchInLower) ||
       productivity.outputcapacity
         .toString()
         .toLowerCase()
@@ -136,30 +124,10 @@ export const ProductivityTable: React.FC<ProductivityTableProps> = ({
               <TableCell className="font-black">
                 {indexOfFirstItem + index + 1}
               </TableCell>
-              <TableCell>
-                {
-                  MachineType.find((m) => m.id === productivity.objecttype_id)
-                    ?.objecttype
-                }
-              </TableCell>
-              <TableCell>
-                {
-                  MachineId.find((m) => m.id === productivity.objectid_id)
-                    ?.objectid
-                }
-              </TableCell>
-              <TableCell>
-                {
-                  MachineGroup.find((m) => m.id === productivity.objectgroup_id)
-                    ?.objectgroup
-                }
-              </TableCell>
-              <TableCell>
-                {
-                  MachineDetail.find((m) => m.id === productivity.objectcode_id)
-                    ?.objectcode
-                }
-              </TableCell>
+              <TableCell>{productivity.objecttype.trim()}</TableCell>
+              <TableCell>{productivity.objectid.trim()}</TableCell>
+              <TableCell>{productivity.objectgroup.trim()}</TableCell>
+              <TableCell>{productivity.objectcode.trim()}</TableCell>
               <TableCell>{productivity.outputcapacity}</TableCell>
               <TableCell>{productivity.outputuom.trim()}</TableCell>
               <TableCell>{productivity.outputtime.trim()}</TableCell>
