@@ -12,13 +12,16 @@ import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { Input } from "../ui/input.tsx";
 import { Button } from "../ui/button.tsx";
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 interface ProductivityTableProps {
   filteredData: MachineProductivity[];
+  isLoading: boolean;
 }
 
 export const ProductivityTable: React.FC<ProductivityTableProps> = ({
   filteredData,
+  isLoading,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
@@ -75,6 +78,18 @@ export const ProductivityTable: React.FC<ProductivityTableProps> = ({
   ) => {
     setCurrentPage(pageNumber);
   };
+  if (isLoading) {
+    return (
+      <div>
+        <DotLottieReact
+          src="https://lottie.host/84f4e184-a82b-4fb9-9566-f2e7972c012b/q3pDfG6QNK.json"
+          backgroundColor="transparent"
+          loop 
+          autoplay
+        />
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -86,7 +101,7 @@ export const ProductivityTable: React.FC<ProductivityTableProps> = ({
           value={searchTerm}
           onChange={handleSearchChange}
         />
-        <Button type="button" onClick={handleSearchSubmit}>
+        <Button type="button" onClick={handleSearchSubmit} className="bg-[#385878] text-[#fff] hover:bg-[#2d475f]">
           <svg
             fill="none"
             height="24"

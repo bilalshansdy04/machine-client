@@ -17,29 +17,25 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 export default function Chart({ data }: { data: any[] }) {
-  const [selectedObjectCode, setSelectedObjectCode] = React.useState(data[0]?.objectcode || ""); // Default to first objectcode
+  const [selectedObjectCode, setSelectedObjectCode] = React.useState(""); // Default to empty string
   const [selectedValue, setSelectedValue] = React.useState("outputcapacity");
-
-  // Debugging: Log data yang diterima oleh Chart
-  console.log("Data yang diterima oleh Chart:", data);
 
   // Get unique object codes from data for dropdown
   const objectCodes = [...new Set(data.map((item) => item.objectcode))];
 
   // Filter data based on selected object code
   const filteredData = data
-    .filter((item) => selectedObjectCode === "" || item.objectcode === selectedObjectCode)
+    .filter(
+      (item) =>
+        selectedObjectCode === "" || item.objectcode === selectedObjectCode
+    )
     .map((item) => {
-      // Membersihkan string dari karakter yang tidak diperlukan
       const capacity = parseFloat(item.outputcapacity.replace(/[\$,]/g, ""));
       const cost = parseFloat(item.outputcost.replace(/[\$,]/g, "")); // Hilangkan karakter $, koma dan titik
-
-      // Debugging: Log setiap item yang difilter dan hasil parsingnya
-      console.log("Item yang difilter:", item);
-      console.log("Output Capacity:", capacity, "Output Cost:", cost);
 
       return {
         date: item.enddate.split(" ")[0], // Get the date part from enddate
@@ -61,7 +57,7 @@ export default function Chart({ data }: { data: any[] }) {
         selectedValue === "outputcapacity"
           ? "Output Capacity (TON)"
           : "Output Cost (IDR)",
-      color: "#2563eb",
+      color: "#385878",
     },
   };
 
@@ -72,7 +68,10 @@ export default function Chart({ data }: { data: any[] }) {
         <div className="w-fit h-fit">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline">
+              <Button
+                variant="outline"
+                className="bg-[#f39512] focus:outline-[#f39512] text-[#fff] hover:bg-[#d27f0f] hover:text-[#fff]"
+              >
                 {selectedObjectCode ? selectedObjectCode : "Choose Object Code"}
               </Button>
             </DropdownMenuTrigger>
@@ -97,7 +96,10 @@ export default function Chart({ data }: { data: any[] }) {
         <div className="w-fit h-fit">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline">
+              <Button
+                variant="outline"
+                className="bg-[#f39512] outline-[#f39512] text-[#fff] hover:bg-[#d27f0f] hover:text-[#fff]"
+              >
                 {selectedValue === "outputcapacity"
                   ? "Output Capacity"
                   : "Output Cost"}
@@ -123,24 +125,40 @@ export default function Chart({ data }: { data: any[] }) {
       </div>
 
       {/* Chart */}
-      {filteredData.length > 0 ? (
-        <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-          <BarChart accessibilityLayer data={filteredData}>
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="date"
-              tickLine={false}
-              tickMargin={10}
-              axisLine={false}
-            />
-            <YAxis />
-            <ChartTooltip content={<ChartTooltipContent />} />
-            <ChartLegend content={<ChartLegendContent />} />
-            <Bar dataKey="value" fill="var(--color-value)" radius={4} />
-          </BarChart>
-        </ChartContainer>
+      {selectedObjectCode ? (
+        filteredData.length > 0 ? (
+          <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+            <BarChart accessibilityLayer data={filteredData}>
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey="date"
+                tickLine={false}
+                tickMargin={10}
+                axisLine={false}
+              />
+              <YAxis />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <ChartLegend content={<ChartLegendContent />} />
+              <Bar dataKey="value" fill="var(--color-value)" radius={4} />
+            </BarChart>
+          </ChartContainer>
+        ) : (
+          <p className="text-center">
+            No data available for the selected Object Code.
+          </p>
+        )
       ) : (
-        <p className="text-center">No data available for the selected Object Code.</p>
+        <div className="flex flex-col items-center justify-center">
+          <div className="">
+            <DotLottieReact
+              src="https://lottie.host/84f4e184-a82b-4fb9-9566-f2e7972c012b/q3pDfG6QNK.json"
+              backgroundColor="transparent"
+              loop
+              autoplay
+            />
+          </div>
+          <p>Choose Object Code To Display Chart</p>
+        </div>
       )}
     </div>
   );
