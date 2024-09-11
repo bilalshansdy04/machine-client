@@ -1,15 +1,29 @@
 import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "./Navbar";
+import { useEffect } from "react";
 
 const Root = () => {
   const location = useLocation();
 
+  useEffect(() => {
+    // Ganti title berdasarkan path
+    switch (location.pathname) {
+      case "/":
+        document.title = "Dashboard | Home";
+        break;
+      case "/maps":
+        document.title = "Dashboard | Maps";
+        break;
+      default:
+        document.title = "Dashboard";
+        break;
+    }
+  }, [location.pathname]);
+
   return (
     <div>
-      {/* Tampilkan Navbar kecuali di halaman /maps */}
       {location.pathname !== '/maps' && <Navbar />}
       <div className="px-36 pt-20 bg-[#eff3f8]">
-        {/* Outlet untuk memuat halaman berdasarkan rute */}
         <Outlet />
       </div>
     </div>

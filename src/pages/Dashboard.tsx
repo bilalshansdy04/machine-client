@@ -78,7 +78,7 @@ export default function Dashboard() {
       property: "PJLBBS",
       fields: "objecttype,objectgroup,objectid,objectcode,outputcapacity,outputuom,outputtime,outputcost,startdate,enddate,objectstatus",
       pageno: "0",
-      recordperpage: "20",
+      recordperpage: "999999999999",
       condition: {
         objecttype: {
           operator: "like",
