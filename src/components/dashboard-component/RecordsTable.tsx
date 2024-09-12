@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { MachineProductivity } from "../../pages/Dashboard";
+import { MachineProductivity } from "../../pages/Dashboard.tsx";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { Input } from "../ui/input.tsx";
@@ -24,7 +24,7 @@ interface ProductivityTableProps {
   isLoading: boolean;
 }
 
-export const ProductivityTable: React.FC<ProductivityTableProps> = ({
+export const RecordsTable: React.FC<ProductivityTableProps> = ({
   filteredData,
   uniqueValues,
   selectedFilters,

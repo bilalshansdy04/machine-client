@@ -1,9 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import CryptoJS from "crypto-js";
-import { FilterDropdowns } from "@/components/dashboard-component/FilterDropdowns";
 import { ProductivityTable } from "@/components/dashboard-component/ProductivityTable";
 import Chart from "@/components/dashboard-component/Chart";
+import Maps from "@/components/dashboard-component/Maps";
 
 export interface MachineProductivity {
   objectid: string;
@@ -76,7 +76,8 @@ export default function Dashboard() {
       command: "SELECT",
       group: "XCYTUA",
       property: "PJLBBS",
-      fields: "objecttype,objectgroup,objectid,objectcode,outputcapacity,outputuom,outputtime,outputcost,startdate,enddate,objectstatus",
+      fields:
+        "objecttype,objectgroup,objectid,objectcode,outputcapacity,outputuom,outputtime,outputcost,startdate,enddate,objectstatus",
       pageno: "0",
       recordperpage: "999999999999",
       condition: {
@@ -124,8 +125,8 @@ export default function Dashboard() {
         if (Array.isArray(parsedData.data)) {
           setApiData(parsedData.data);
         }
-      }else{
-        console.log("Invalid response")
+      } else {
+        console.log("Invalid response");
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -152,36 +153,27 @@ export default function Dashboard() {
     };
   }, [apiData]);
 
-  const filteredData = apiData.filter((record) => {
-    return Object.entries(selectedFilters).every(([field, value]) => {
-      if (value === "" || value.startsWith("All")) return true;
-      return record[field as keyof MachineProductivity]?.toString() === value;
-    });
-  });
-
-  const handleFilterChange = (
-    field: keyof MachineProductivity,
-    value: string
-  ) => {
-    setSelectedFilters((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
   return (
-    <div>
-      <div className="w-full h-svh flex flex-col justify-center items-center">
-        <Chart data={filteredData} />
+    <div className="flex flex-col gap-10">
+      <div className="w-full h-[33rem] rounded-xl bg-white px-10 pt-10 pb-16 shadow">
+        <Chart data={apiData} />
       </div>
-      <div className="w-full h-svh flex flex-col justify-center items-center">
-        <FilterDropdowns
+      <div className="w-full h-[33rem] rounded-xl bg-white px-10 pt-10 pb-16 shadow">
+        <ProductivityTable
+          filteredData={apiData}
           uniqueValues={uniqueValues}
           selectedFilters={selectedFilters}
-          handleFilterChange={handleFilterChange}
           fieldLabels={fieldLabels}
+          handleFilterChange={(field, value) =>
+            setSelectedFilters((prev) => ({
+              ...prev,
+              [field]: value,
+            }))
+          }
         />
-        <ProductivityTable filteredData={filteredData} />
+      </div>
+      <div className="w-full h-[33rem] rounded-xl bg-white px-10 pt-10 pb-16 shadow" >
+        <Maps />
       </div>
     </div>
   );

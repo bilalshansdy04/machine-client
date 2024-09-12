@@ -23,7 +23,7 @@ const Root = () => {
   return (
     <div>
       {location.pathname !== '/maps' && <Navbar />}
-      <div className="px-36 pt-20 bg-[#eff3f8]">
+      <div className="px-36 pt-10 pb-20 bg-[#eff3f8]">
         <Outlet />
       </div>
     </div>
