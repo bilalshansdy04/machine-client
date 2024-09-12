@@ -63,7 +63,7 @@ export default function Maps() {
     const formattedJsonString = JSON.stringify(jsonData, null, 2);
     const encryptedMessage = encryptMessage(formattedJsonString);
 
-    console.log("Encrypted message:", encryptedMessage); // Log encrypted message
+    // console.log("Encrypted message:", encryptedMessage); // Log encrypted message
 
     const payload = {
       apikey: API_KEY,
@@ -85,14 +85,14 @@ export default function Maps() {
       if (response.data.code == 200) {
         const decryptedData = decryptMessage(response.data.message);
 
-        console.log("Decrypted message:", decryptedData);
+        // console.log("Decrypted message:", decryptedData);
 
         const parsedData = JSON.parse(decryptedData);
         const messageArray = Array.isArray(parsedData.data)
           ? parsedData.data
           : [];
 
-        console.log("Decrypted message array:", messageArray);
+        // console.log("Decrypted message array:", messageArray);
 
         if (Array.isArray(parsedData.data)) {
           setApiData(parsedData.data);
@@ -113,7 +113,7 @@ export default function Maps() {
 
   return (
     <div className="relative space-y-3">
-      <div id="maps">
+      <div>
         <h1 className="font-bold text-xl">Maps</h1>
         <h2 className="font-normal text-lg text-slate-500">
           Machine Locations on Map

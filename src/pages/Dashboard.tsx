@@ -4,6 +4,7 @@ import CryptoJS from "crypto-js";
 import { ProductivityTable } from "@/components/dashboard-component/ProductivityTable";
 import Chart from "@/components/dashboard-component/Chart";
 import Maps from "@/components/dashboard-component/Maps";
+import RecordTable from "@/components/dashboard-component/RecordTable";
 
 export interface MachineProductivity {
   objectid: string;
@@ -26,7 +27,6 @@ const SECRET_KEY = import.meta.env.VITE_SECRET_KEY;
 const IV = import.meta.env.VITE_IV;
 const API_KEY = import.meta.env.VITE_API_KEY;
 
-// Enkripsi dan Dekripsi
 const encryptMessage = (message: string): string => {
   const key = CryptoJS.enc.Utf8.parse(SECRET_KEY);
   const ivHex = CryptoJS.enc.Utf8.parse(IV);
@@ -100,7 +100,7 @@ export default function Dashboard() {
     };
 
     // Log the formatted message
-    console.log("format message", JSON.stringify(payload, null, 2));
+    // console.log("format message", JSON.stringify(payload, null, 2));
 
     try {
       const response = await axios.post(API_URL, payload, {
@@ -110,13 +110,13 @@ export default function Dashboard() {
       });
 
       // Log the raw response with specific format
-      const responsePayload = {
-        uniqueid: response.data.uniqueid,
-        timestamp: response.data.timestamp,
-        code: response.data.code,
-        message: response.data.message,
-      };
-      console.log("format response", JSON.stringify(responsePayload, null, 2));
+      // const responsePayload = {
+      //   uniqueid: response.data.uniqueid,
+      //   timestamp: response.data.timestamp,
+      //   code: response.data.code,
+      //   message: response.data.message,
+      // };
+      // console.log("format response", JSON.stringify(responsePayload, null, 2));
 
       if (response.data.code == 200) {
         const decryptedData = decryptMessage(response.data.message);
@@ -155,10 +155,10 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col gap-10">
-      <div className="w-full h-[33rem] rounded-xl bg-white px-10 pt-10 pb-16 shadow">
+      <div className="w-full h-[33rem] rounded-xl bg-white px-10 pt-10 pb-16 shadow"  id="chart">
         <Chart data={apiData} />
       </div>
-      <div className="w-full h-[33rem] rounded-xl bg-white px-10 pt-10 pb-16 shadow">
+      <div className="w-full h-[33rem] rounded-xl bg-white px-10 pt-10 pb-16 shadow" id="productivity">
         <ProductivityTable
           filteredData={apiData}
           uniqueValues={uniqueValues}
@@ -172,7 +172,10 @@ export default function Dashboard() {
           }
         />
       </div>
-      <div className="w-full h-[33rem] rounded-xl bg-white px-10 pt-10 pb-16 shadow" >
+      <div className="w-full h-[37rem] rounded-xl bg-white px-10 pt-10 pb-16 shadow" id="record">
+        <RecordTable/>
+      </div>
+      <div className="w-full h-[33rem] rounded-xl bg-white px-10 pt-10 pb-16 shadow" id="maps">
         <Maps />
       </div>
     </div>

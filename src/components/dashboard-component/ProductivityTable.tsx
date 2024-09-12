@@ -43,7 +43,7 @@ export const ProductivityTable: React.FC<ProductivityTableProps> = ({
 
   const handleSearchSubmit = () => {
     setConfirmedSearchTerm(searchTerm);
-    setCurrentPage(1); // Reset to first page after search
+    setCurrentPage(1);
   };
 
   // Filter the data based on the confirmed search term
@@ -104,7 +104,7 @@ export const ProductivityTable: React.FC<ProductivityTableProps> = ({
     <div className="flex flex-col min-h-[29rem] justify-between">
       <div className="space-y-5">
         <div className="flex justify-between">
-          <div  id="table">
+          <div>
             <h1 className="font-bold text-xl">Table</h1>
             <h2 className="font-normal text-lg text-slate-500">
               Overview of Machine Productivity

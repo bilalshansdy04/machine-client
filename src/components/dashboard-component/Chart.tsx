@@ -48,7 +48,7 @@ export default function Chart({ data }: { data: any[] }) {
       };
     });
 
-  console.log("Filtered Data for Chart:", filteredData); // Log filtered data
+  // console.log("Filtered Data for Chart:", filteredData); // Log filtered data
 
   // Define chartConfig based on selected value
   const chartConfig: ChartConfig = {
@@ -64,7 +64,7 @@ export default function Chart({ data }: { data: any[] }) {
   return (
     <div className="w-full h-full relative">
       <div className="flex gap-6 justify-between mb-5">
-        <div id="chart">
+        <div>
           <h1 className="font-bold text-xl">Chart</h1>
           <h2 className="font-normal text-lg text-slate-500">
             Visual Representation of Machine Data

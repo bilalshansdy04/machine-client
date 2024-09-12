@@ -22,7 +22,7 @@ export default function Navbar() {
       <nav
         className={`transition-all duration-300 top-0 left-1/2 transform -translate-x-1/2 py-2 z-20 ${
           isScrolled
-            ? 'fixed bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-600 rounded-full w-3/4 shadow-lg mt-5'
+            ? 'fixed bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-600 rounded-full w-3/4 shadow-lg mt-5 backdrop-blur-sm bg-opacity-80'
             : 'relative bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-600 w-full'
         }`}
         style={{ boxShadow: isScrolled ? '0 2px 10px rgba(0, 0, 0, 0.1)' : 'none' }}
@@ -82,8 +82,13 @@ export default function Navbar() {
                 <a href="#chart"><h1>Chart</h1></a>
               </li>
               <li>
-                <a href="#table">
-                  <h1>Table</h1>
+                <a href="#productivity">
+                  <h1>Productivity</h1>
+                </a>
+              </li>
+              <li>
+                <a href="#record">
+                  <h1>Record</h1>
                 </a>
               </li>
               <li>
