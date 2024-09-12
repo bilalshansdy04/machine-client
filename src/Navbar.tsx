@@ -1,30 +1,47 @@
-import React from "react";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { useEffect, useState } from 'react';
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 export default function Navbar() {
-  const [position, setPosition] = React.useState("bottom");
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  const handleScroll = () => {
+    if (window.scrollY > 0) {
+      setIsScrolled(true);
+    } else {
+      setIsScrolled(false);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <div>
-      <nav className="bg-white dark:bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600 py-1">
-        <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-          <a
-            href="/"
-            className="flex items-center space-x-3 rtl:space-x-reverse"
-          >
-            <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-              Project
-            </span>
+    <div className='w-full flex justify-center'>
+      <nav
+        className={`transition-all duration-300 top-0 left-1/2 transform -translate-x-1/2 py-2 z-20 ${
+          isScrolled
+            ? 'fixed bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-600 rounded-full w-3/4 shadow-lg mt-5 backdrop-blur-sm bg-opacity-80'
+            : 'relative bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-600 w-full'
+        }`}
+        style={{ boxShadow: isScrolled ? '0 2px 10px rgba(0, 0, 0, 0.1)' : 'none' }}
+      >
+        <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4 pl-12">
+          <a href="/" className="flex items-center">
+            <h1 className="text-4xl font-bold text-[#f39512] drop-shadow-xl">
+              Dash<span className="text-[#385878]">board</span>
+            </h1>
+            <div className="w-24">
+              <DotLottieReact
+                src="https://lottie.host/b13a4b33-c45c-49a0-9eda-e5026e48418d/oRSXnTjKMV.json"
+                backgroundColor="transparent"
+                loop
+                autoplay
+              />
+            </div>
           </a>
-          <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+          <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse opacity-0">
             <button
               type="button"
               className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
@@ -48,9 +65,9 @@ export default function Navbar() {
               >
                 <path
                   stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
                   d="M1 1h15M1 7h15M1 13h15"
                 />
               </svg>
@@ -62,51 +79,23 @@ export default function Navbar() {
           >
             <ul className="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
               <li>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <h1 className="cursor-pointer text-lg font-semibold">
-                      Table{" "}
-                    </h1>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56">
-                    <DropdownMenuSeparator />
-                    <DropdownMenuRadioGroup
-                      value={position}
-                      onValueChange={setPosition}
-                    >
-                      <DropdownMenuRadioItem value="MACHINETYPE">
-                        <a href="/type">MACHINETYPE</a>
-                      </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="MACHINEGROUP">
-                        <a href="/group">MACHINEGROUP</a>
-                      </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="MACHINEID">
-                        <a href="/id">MACHINEID</a>
-                      </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="MACHINEDETAIL">
-                        <a href="/detail">MACHINEDETAIL</a>
-                      </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="MACHINEPROFILE">
-                        <a href="/machine-profile">MACHINEPROFILE</a>
-                      </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="MACHINEPRODUCTIVITY">
-                        <a href="/productivity">MACHINEPRODUCTIVITY</a>
-                      </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="MACHINERECORDS">
-                        <a href="/records">MACHINERECORDS</a>
-                      </DropdownMenuRadioItem>
-                    </DropdownMenuRadioGroup>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <a href="#chart"><h1>Chart</h1></a>
               </li>
-              {/* <li>
-                <a
-                  href="#"
-                  className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
-                >
-                  About
+              <li>
+                <a href="#productivity">
+                  <h1>Productivity</h1>
                 </a>
-              </li> */}
+              </li>
+              <li>
+                <a href="#record">
+                  <h1>Record</h1>
+                </a>
+              </li>
+              <li>
+                <a href="#maps">
+                  <h1>Maps</h1>
+                </a>
+              </li>
             </ul>
           </div>
         </div>
