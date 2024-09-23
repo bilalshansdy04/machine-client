@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import CryptoJS from "crypto-js";
 import {
@@ -69,30 +69,8 @@ export default function RecordTable() {
 
   const handleSearchSubmit = () => {
     setConfirmedSearchTerm(searchTerm);
-    setCurrentPage(1);
+    setCurrentPage(3);
   };
-
-  const filteredAndSearchedData = apiData.filter((record) => {
-    const searchInLower = confirmedSearchTerm.toLowerCase();
-    return (
-      record.objecttype.toLowerCase().includes(searchInLower) ||
-      record.objectid.toLowerCase().includes(searchInLower) ||
-      record.objectgroup.toLowerCase().includes(searchInLower) ||
-      record.objectcode.toLowerCase().includes(searchInLower) ||
-      record.recorddate.toLowerCase().includes(searchInLower) ||
-      record.recordtaskid.toLowerCase().includes(searchInLower) ||
-      record.recordno.toLowerCase().includes(searchInLower) ||
-      record.recordby.toLowerCase().includes(searchInLower) ||
-      record.recorddescription.toLowerCase().includes(searchInLower) ||
-      record.recordnotes.toLowerCase().includes(searchInLower) ||
-      record.recordstatus.toLowerCase().includes(searchInLower)
-    );
-  });
-
-  const paginatedData = filteredAndSearchedData.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
 
   const fetchData = async () => {
     const jsonData = {
@@ -103,8 +81,8 @@ export default function RecordTable() {
       property: "PJLBBS",
       fields:
         "objecttype,objectgroup,objectid,objectcode,recorddate,recordtaskid,recordno,recordby,recorddescription,recordnotes,recordstatus",
-      pageno: "0",
-      recordperpage: "20",
+      pageno: 0,
+      recordperpage: 20,
       condition: {
         objectid: {
           operator: "LIKE",
@@ -124,19 +102,12 @@ export default function RecordTable() {
       message: encryptedMessage,
     };
 
-    console.log("format message", JSON.stringify(payload, null, 2));
-
     try {
       const response = await axios.post(API_URL, payload, {
         headers: {
           "Content-Type": "application/json",
         },
       });
-
-      console.log(
-        "format response Record",
-        JSON.stringify(response.data, null, 2)
-      );
 
       if (response.data.code == 200) {
         const decryptedData = decryptMessage(response.data.message);
@@ -152,109 +123,143 @@ export default function RecordTable() {
     }
   };
 
+  // Fetch data whenever currentPage changes
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [currentPage]); // Tambahkan currentPage sebagai dependency
 
-  const totalPages = Math.ceil(filteredAndSearchedData.length / itemsPerPage);
+  const filteredAndSearchedData = useMemo(() => {
+    return apiData
+      .filter((record) => {
+        const searchInLower = confirmedSearchTerm.toLowerCase();
+        return (
+          record.objecttype.toLowerCase().includes(searchInLower) ||
+          record.objectid.toLowerCase().includes(searchInLower) ||
+          record.objectgroup.toLowerCase().includes(searchInLower) ||
+          record.objectcode.toLowerCase().includes(searchInLower) ||
+          record.recorddate.toLowerCase().includes(searchInLower) ||
+          record.recordtaskid.toLowerCase().includes(searchInLower) ||
+          record.recordno.toLowerCase().includes(searchInLower) ||
+          record.recordby.toLowerCase().includes(searchInLower) ||
+          record.recorddescription.toLowerCase().includes(searchInLower) ||
+          record.recordnotes.toLowerCase().includes(searchInLower) ||
+          record.recordstatus.toLowerCase().includes(searchInLower)
+        );
+      })
+      .sort((a, b) => a.recorddate.localeCompare(b.recorddate)); // Add sorting
+  }, [apiData, confirmedSearchTerm]);
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentData = filteredAndSearchedData.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+
+  const totalPages = useMemo(() => {
+    return Math.ceil(filteredAndSearchedData.length / itemsPerPage);
+  }, [filteredAndSearchedData, itemsPerPage]);
 
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
     pageNumber: number
   ) => {
+    console.log("Page Changed: ", pageNumber); // Tambahkan untuk debugging
     setCurrentPage(pageNumber);
   };
 
   return (
-    <div>
-      <div className="space-y-5">
-        <div className="flex justify-between    ">
-          <div>
-            <h1 className="font-bold text-xl">Table</h1>
-            <h2 className="font-normal text-lg text-slate-500">
-              Overview of Machine Records
-            </h2>
-          </div>
-          <div className="flex w-full max-w-sm items-center space-x-2 mb-3">
-            <Input
-              type="text"
-              placeholder="Search"
-              value={searchTerm}
-              onChange={handleSearchChange}
-            />
-            <Button
-              type="button"
-              onClick={handleSearchSubmit}
-              className="bg-[#385878] text-[#fff] hover:bg-[#2d475f]"
-            >
-              <svg
-                fill="none"
-                height="24"
-                viewBox="0 0 24 24"
-                width="24"
-                xmlns="http://www.w3.org/2000/svg"
+    <div className="flex flex-col min-h-[32rem] justify-between">
+      <div>
+        <div className="space-y-5">
+          <div className="flex justify-between">
+            <div>
+              <h1 className="font-bold text-xl">Table</h1>
+              <h2 className="font-normal text-lg text-slate-500">
+                Overview of Machine Records
+              </h2>
+            </div>
+            <div className="flex w-full max-w-sm items-center space-x-2 mb-3">
+              <Input
+                type="text"
+                placeholder="Search"
+                value={searchTerm}
+                onChange={handleSearchChange}
+              />
+              <Button
+                type="button"
+                onClick={handleSearchSubmit}
+                className="bg-[#385878] text-[#fff] hover:bg-[#2d475f]"
               >
-                <g
-                  stroke="#fff"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1.5"
+                <svg
+                  fill="none"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  width="24"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  <path d="m17.5 17.5 4.5 4.5" strokeLinecap="round" />
-                  <path d="m20 11c0-4.97056-4.0294-9-9-9-4.97056 0-9 4.02944-9 9 0 4.9706 4.02944 9 9 9 4.9706 0 9-4.0294 9-9z" />
-                </g>
-              </svg>
-            </Button>
+                  <g
+                    stroke="#fff"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="1.5"
+                  >
+                    <path d="m17.5 17.5 4.5 4.5" strokeLinecap="round" />
+                    <path d="m20 11c0-4.97056-4.0294-9-9-9-4.97056 0-9 4.02944-9 9 0 4.9706 4.02944 9 9 9 4.9706 0 9-4.0294 9-9z" />
+                  </g>
+                </svg>
+              </Button>
+            </div>
           </div>
-        </div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="font-black">No</TableHead>
-              <TableHead>Object Type</TableHead>
-              <TableHead>Object ID</TableHead>
-              <TableHead>Object Group</TableHead>
-              <TableHead>Object Code</TableHead>
-              <TableHead>Record Date</TableHead>
-              <TableHead>Record Task ID</TableHead>
-              <TableHead>Record No</TableHead>
-              <TableHead>Record By</TableHead>
-              <TableHead>Record Description</TableHead>
-              <TableHead>Record Notes</TableHead>
-              <TableHead>Record Status</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginatedData.map((record: MachineRecord, index: number) => (
-              <TableRow key={record.recordno}>
-                <TableCell className="font-black">
-                  {(currentPage - 1) * itemsPerPage + index + 1}
-                </TableCell>
-                <TableCell>{record.objecttype.trim()}</TableCell>
-                <TableCell>{record.objectid.trim()}</TableCell>
-                <TableCell>{record.objectgroup.trim()}</TableCell>
-                <TableCell>{record.objectcode.trim()}</TableCell>
-                <TableCell>{record.recorddate}</TableCell>
-                <TableCell>{record.recordtaskid.trim()}</TableCell>
-                <TableCell>{record.recordno.trim()}</TableCell>
-                <TableCell>{record.recordby.trim()}</TableCell>
-                <TableCell>{record.recorddescription.trim()}</TableCell>
-                <TableCell>{record.recordnotes.trim()}</TableCell>
-                <TableCell>{record.recordstatus.trim()}</TableCell>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="font-black">No</TableHead>
+                <TableHead>Object Type</TableHead>
+                <TableHead>Object ID</TableHead>
+                <TableHead>Object Group</TableHead>
+                <TableHead>Object Code</TableHead>
+                <TableHead>Record Date</TableHead>
+                <TableHead>Record Task ID</TableHead>
+                <TableHead>Record No</TableHead>
+                <TableHead>Record By</TableHead>
+                <TableHead>Record Description</TableHead>
+                <TableHead>Record Notes</TableHead>
+                <TableHead>Record Status</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <div className="flex justify-center w-full">
-          <Stack spacing={2} mt={2}>
-            <Pagination
-              count={totalPages}
-              page={currentPage}
-              onChange={handlePageChange}
-              shape="rounded"
-            />
-          </Stack>
+            </TableHeader>
+            <TableBody>
+              {currentData.map((record, index) => (
+                <TableRow key={index}>
+                  <TableCell className="font-medium">
+                    {indexOfFirstItem + index + 1}
+                  </TableCell>
+                  <TableCell>{record.objecttype}</TableCell>
+                  <TableCell>{record.objectid}</TableCell>
+                  <TableCell>{record.objectgroup}</TableCell>
+                  <TableCell>{record.objectcode}</TableCell>
+                  <TableCell>{record.recorddate}</TableCell>
+                  <TableCell>{record.recordtaskid}</TableCell>
+                  <TableCell>{record.recordno}</TableCell>
+                  <TableCell>{record.recordby}</TableCell>
+                  <TableCell>{record.recorddescription}</TableCell>
+                  <TableCell>{record.recordnotes}</TableCell>
+                  <TableCell>{record.recordstatus}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
+      </div>
+      <div className="flex justify-center w-full">
+        <Stack spacing={2} mt={2}>
+          <Pagination
+            count={totalPages}
+            page={currentPage}
+            onChange={handlePageChange}
+            shape="rounded"
+          />
+        </Stack>
       </div>
     </div>
   );
