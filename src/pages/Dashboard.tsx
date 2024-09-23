@@ -175,7 +175,7 @@ export default function Dashboard() {
       <div className="w-full h-[37rem] rounded-xl bg-white px-10 pt-10 pb-16 shadow" id="record">
         <RecordTable/>
       </div>
-      <div className="w-full h-[33rem] rounded-xl bg-white px-10 pt-10 pb-16 shadow" id="maps">
+      <div className="w-full h-[34rem] rounded-xl bg-white px-10 pt-10 pb-16 shadow" id="maps">
         <Maps />
       </div>
     </div>
