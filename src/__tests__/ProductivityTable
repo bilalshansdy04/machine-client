@@ -1,0 +1,24 @@
+import React from "react";
+import { render, screen } from "@testing-library/react";
+import { ProductivityTable } from "../components/dashboard-component/ProductivityTable.tsx";
+
+test("renders Productivity Table with subtitle", () => {
+  render(
+    <ProductivityTable
+      filteredData={apiData}
+      uniqueValues={uniqueValues}
+      selectedFilters={selectedFilters}
+      fieldLabels={fieldLabels}
+      handleFilterChange={(field, value) =>
+        setSelectedFilters((prev) => ({
+          ...prev,
+          [field]: value,
+        }))
+      }
+    />
+  );
+  const subtitleElement = screen.getByText(
+    /Overview of Machine Productivity Metrics/i
+  );
+  expect(subtitleElement).toBeInTheDocument();
+});

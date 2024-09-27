@@ -19,15 +19,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import { MachineProductivity } from "@/pages/Dashboard";
 
-export default function Chart({ data }: { data: any[] }) {
-  const [selectedObjectCode, setSelectedObjectCode] = React.useState(""); // Default to empty string
+interface ChartProps {
+  data: MachineProductivity[];
+}
+
+export const Chart: React.FC<ChartProps> = ({ data }) =>  {
+  const [selectedObjectCode, setSelectedObjectCode] = React.useState(""); 
   const [selectedValue, setSelectedValue] = React.useState("outputcapacity");
 
-  // Get unique object codes from data for dropdown
   const objectCodes = [...new Set(data.map((item) => item.objectcode))];
 
-  // Filter data based on selected object code
   const filteredData = data
     .filter(
       (item) =>
@@ -48,9 +51,6 @@ export default function Chart({ data }: { data: any[] }) {
       };
     });
 
-  // console.log("Filtered Data for Chart:", filteredData); // Log filtered data
-
-  // Define chartConfig based on selected value
   const chartConfig: ChartConfig = {
     value: {
       label:

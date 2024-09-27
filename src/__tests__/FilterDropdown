@@ -1,0 +1,57 @@
+import { render, screen } from '@testing-library/react';
+import { FilterDropdowns } from "../components/dashboard-component/FilterDropdowns.tsx";
+import { jest } from '@jest/globals';
+
+describe('FilterDropdown', () => {
+  const uniqueValues = {
+    objectid: ['ID1', 'ID2'],
+    id: ['1', '2'],
+    objecttype_id: ['Type1', 'Type2'],
+    objectgroup_id: ['Group1', 'Group2'],
+    objectid_id: ['ID_ID1', 'ID_ID2'],
+    objectcode_id: ['Code1', 'Code2'],
+    outputcapacity: ['100', '200'],
+    outputuom: ['UOM1', 'UOM2'],
+  };
+
+  const selectedFilters = {
+    objectid: ['ID1'],
+    id: [],
+    objecttype_id: [],
+    objectgroup_id: [],
+    objectid_id: [],
+    objectcode_id: [],
+    outputcapacity: [],
+    outputuom: [],
+  };
+
+  const fieldLabels = {
+    objectid: 'Object ID',
+    id: 'ID',
+    objecttype_id: 'Object Type',
+    objectgroup_id: 'Object Group',
+    objectid_id: 'Object ID ID',
+    objectcode_id: 'Object Code',
+    outputcapacity: 'Output Capacity',
+    outputuom: 'Output UOM',
+  };
+
+  test('renders FilterDropdown with dynamic data', () => {
+    render(
+      <FilterDropdowns
+        uniqueValues={uniqueValues}
+        selectedFilters={selectedFilters}
+        handleFilterChange={jest.fn()}
+        fieldLabels={fieldLabels}
+      />
+    );
+
+    expect(screen.getByText(/Choose Object Code/i)).toBeInTheDocument();
+    // Check if the dropdown items are rendered correctly
+    uniqueValues.objectid.forEach((item) => {
+      expect(screen.getByText(item)).toBeInTheDocument();
+    });
+  });
+
+  // Additional tests for interaction, etc.
+});

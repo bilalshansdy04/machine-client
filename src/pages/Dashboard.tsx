@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { encryptMessage, decryptMessage } from "@/utils/aes256";
 import { ProductivityTable } from "@/components/dashboard-component/ProductivityTable";
-import Chart from "@/components/dashboard-component/Chart";
+import { Chart } from "@/components/dashboard-component/Chart";
 import Maps from "@/components/dashboard-component/Maps";
 import RecordTable from "@/components/dashboard-component/RecordTable";
 

@@ -1,0 +1,27 @@
+import { render, screen } from '@testing-library/react';
+import { Chart } from '../components/dashboard-component/Chart';
+import { MachineProductivity } from '@/pages/Dashboard';
+
+const mockData: MachineProductivity[] = [
+    {
+      objectid: '1',
+      id: 1,
+      objecttype_id: 1,
+      objectgroup_id: 1,
+      objectid_id: 1,
+      objectcode_id: 1,
+      outputcapacity: '100',
+      outputuom: 'kg',
+      outputtime: '1h',
+      outputcost: '1000',
+      startdate: '2024-01-01',
+      enddate: '2024-12-31',
+      objectstatus: 'active',
+    },
+  ];
+
+test('renders Chart with subtitle', () => {
+    render(<Chart data={mockData} />);
+    const subtitleElement = screen.getByText(/Visual Representation of Machine Data/i);
+    expect(subtitleElement).toBeInTheDocument();
+});
