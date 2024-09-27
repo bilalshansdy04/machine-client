@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
-import CryptoJS from "crypto-js";
+import { encryptMessage, decryptMessage } from "@/utils/aes256";
 import { ProductivityTable } from "@/components/dashboard-component/ProductivityTable";
 import Chart from "@/components/dashboard-component/Chart";
 import Maps from "@/components/dashboard-component/Maps";
@@ -23,32 +23,8 @@ export interface MachineProductivity {
 }
 
 const API_URL = import.meta.env.VITE_MACHINE_PRODUCTIVITY_URL;
-const SECRET_KEY = import.meta.env.VITE_SECRET_KEY;
 const IV = import.meta.env.VITE_IV;
 const API_KEY = import.meta.env.VITE_API_KEY;
-
-const encryptMessage = (message: string): string => {
-  const key = CryptoJS.enc.Utf8.parse(SECRET_KEY);
-  const ivHex = CryptoJS.enc.Utf8.parse(IV);
-  const encrypted = CryptoJS.AES.encrypt(message, key, {
-    iv: ivHex,
-    mode: CryptoJS.mode.CBC,
-    padding: CryptoJS.pad.Pkcs7,
-  });
-  return encrypted.ciphertext.toString(CryptoJS.enc.Hex).toUpperCase();
-};
-
-const decryptMessage = (encryptedMessage: string): string => {
-  const key = CryptoJS.enc.Utf8.parse(SECRET_KEY);
-  const ivHex = CryptoJS.enc.Utf8.parse(IV);
-  const encrypted = CryptoJS.enc.Hex.parse(encryptedMessage);
-  const decrypted = CryptoJS.AES.decrypt({ ciphertext: encrypted }, key, {
-    iv: ivHex,
-    mode: CryptoJS.mode.CBC,
-    padding: CryptoJS.pad.Pkcs7,
-  });
-  return decrypted.toString(CryptoJS.enc.Utf8);
-};
 
 // Definisi fieldLabels
 const fieldLabels = {
@@ -85,6 +61,10 @@ export default function Dashboard() {
           operator: "like",
           value: "%",
         },
+        active: {
+          operator: "eq",
+          value: "Y",
+        },
       },
     };
 
@@ -108,15 +88,6 @@ export default function Dashboard() {
           "Content-Type": "application/json",
         },
       });
-
-      // Log the raw response with specific format
-      // const responsePayload = {
-      //   uniqueid: response.data.uniqueid,
-      //   timestamp: response.data.timestamp,
-      //   code: response.data.code,
-      //   message: response.data.message,
-      // };
-      // console.log("format response", JSON.stringify(responsePayload, null, 2));
 
       if (response.data.code == 200) {
         const decryptedData = decryptMessage(response.data.message);
@@ -155,29 +126,49 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col gap-10">
-      <div className="w-full h-[33rem] rounded-xl bg-white px-10 pt-10 pb-16 shadow"  id="chart">
-        <Chart data={apiData} />
-      </div>
-      <div className="w-full h-[33rem] rounded-xl bg-white px-10 pt-10 pb-16 shadow" id="productivity">
-        <ProductivityTable
-          filteredData={apiData}
-          uniqueValues={uniqueValues}
-          selectedFilters={selectedFilters}
-          fieldLabels={fieldLabels}
-          handleFilterChange={(field, value) =>
-            setSelectedFilters((prev) => ({
-              ...prev,
-              [field]: value,
-            }))
-          }
-        />
-      </div>
-      <div className="w-full h-[37rem] rounded-xl bg-white px-10 pt-10 pb-16 shadow" id="record">
-        <RecordTable/>
-      </div>
-      <div className="w-full h-[34rem] rounded-xl bg-white px-10 pt-10 pb-16 shadow" id="maps">
+      <section>
+        <div
+          className="w-full h-[33rem] rounded-xl bg-white px-10 pt-10 pb-16 shadow scroll-mt-20"
+          id="chart"
+        >
+          <Chart data={apiData} />
+        </div>
+      </section>
+      <section>
+        <div
+          className="w-full h-[33rem] rounded-xl bg-white px-10 pt-10 pb-16 shadow scroll-mt-36"
+          id="productivity"
+        >
+          <ProductivityTable
+            filteredData={apiData}
+            uniqueValues={uniqueValues}
+            selectedFilters={selectedFilters}
+            fieldLabels={fieldLabels}
+            handleFilterChange={(field, value) =>
+              setSelectedFilters((prev) => ({
+                ...prev,
+                [field]: value,
+              }))
+            }
+          />
+        </div>
+      </section>
+      <section>
+        <div
+          className="w-full h-[37rem] rounded-xl bg-white px-10 pt-10 pb-16 shadow scroll-mt-36"
+          id="record"
+        >
+          <RecordTable />
+        </div>
+      </section>
+      <section>
+      <div
+        className="w-full h-[34rem] rounded-xl bg-white px-10 pt-10 pb-16 shadow scroll-mt-28"
+        id="maps"
+      >
         <Maps />
       </div>
+      </section>
     </div>
   );
 }

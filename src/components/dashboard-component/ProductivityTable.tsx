@@ -120,7 +120,7 @@ export const ProductivityTable: React.FC<ProductivityTableProps> = ({
             <Button
               type="button"
               onClick={handleSearchSubmit}
-              className="bg-[#385878] text-[#fff] hover:bg-[#2d475f]"
+              className="bg-oceanKnight text-white hover:bg-abyssKnight"
             >
               <svg
                 fill="none"

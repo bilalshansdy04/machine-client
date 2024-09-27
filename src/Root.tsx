@@ -1,5 +1,6 @@
 import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "./Navbar";
+import Footer from "./Footer";
 import { useEffect } from "react";
 
 const Root = () => {
@@ -22,10 +23,11 @@ const Root = () => {
 
   return (
     <div>
-      {location.pathname !== '/maps' && <Navbar />}
+      <Navbar />
       <div className="px-36 pt-10 pb-20 bg-[#eff3f8]">
         <Outlet />
       </div>
+      <Footer/>
     </div>
   );
 };

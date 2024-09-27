@@ -22,6 +22,10 @@ module.exports = {
         sans: ['"Kanit", sans-serif'],
       },
       colors: {
+        flamePhoenix: '#f39512', 
+        emberPhoenix: '#d27f0f',  
+        oceanKnight: '#385878',  
+        abyssKnight: '#2d475f',
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

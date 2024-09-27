@@ -2,7 +2,7 @@ import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import CryptoJS from "crypto-js"; // Import CryptoJS
+import { encryptMessage, decryptMessage } from "../../utils/aes256.ts";
 import {
   Dialog,
   DialogContent,
@@ -29,6 +29,15 @@ export interface MachineId {
   regionid: string;
 }
 
+export interface MachineProfile {
+  id: number;
+  objecttype: string;
+  objectgroup: string;
+  objectid: string;
+  objectcode: string;
+  vendor: string;
+}
+
 export interface MachineProductivity {
   objecttype: string;
   objectgroup: string;
@@ -43,38 +52,15 @@ export interface MachineProductivity {
 }
 
 const API_URL = import.meta.env.VITE_MACHINE_PRODUCTIVITY_URL;
-const SECRET_KEY = import.meta.env.VITE_SECRET_KEY;
 const IV = import.meta.env.VITE_IV;
 const API_KEY = import.meta.env.VITE_API_KEY;
-
-const encryptMessage = (message: string): string => {
-  const key = CryptoJS.enc.Utf8.parse(SECRET_KEY);
-  const ivHex = CryptoJS.enc.Utf8.parse(IV);
-  const encrypted = CryptoJS.AES.encrypt(message, key, {
-    iv: ivHex,
-    mode: CryptoJS.mode.CBC,
-    padding: CryptoJS.pad.Pkcs7,
-  });
-  return encrypted.ciphertext.toString(CryptoJS.enc.Hex).toUpperCase();
-};
-
-const decryptMessage = (encryptedMessage: string): string => {
-  const key = CryptoJS.enc.Utf8.parse(SECRET_KEY);
-  const ivHex = CryptoJS.enc.Utf8.parse(IV);
-  const encrypted = CryptoJS.enc.Hex.parse(encryptedMessage);
-  const decrypted = CryptoJS.AES.decrypt({ ciphertext: encrypted }, key, {
-    iv: ivHex,
-    mode: CryptoJS.mode.CBC,
-    padding: CryptoJS.pad.Pkcs7,
-  });
-  return decrypted.toString(CryptoJS.enc.Utf8);
-};
 
 export default function Maps() {
   const [apiData, setApiData] = useState<MachineId[]>([]);
   const [productivityData, setProductivityData] = useState<
     MachineProductivity[]
   >([]);
+  const [profileData, setProfileData] = useState<MachineProfile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchData = async () => {
@@ -115,6 +101,31 @@ export default function Maps() {
           operator: "like",
           value: "%",
         },
+        active: {
+          operator: "eq",
+          value: "Y",
+        },
+      },
+    };
+
+    const machineProfileMessage = {
+      datacore: "MACHINE",
+      folder: "MACHINEPROFILE",
+      command: "SELECT",
+      group: "XCYTUA",
+      property: "PJLBBS",
+      fields: "objecttype, objectgroup, objectid, vendor",
+      pageno: "0",
+      recordperpage: "50",
+      condition: {
+        objecttype: {
+          operator: "like",
+          value: "%",
+        },
+        active: {
+          operator: "eq",
+          value: "Y",
+        },
       },
     };
 
@@ -124,10 +135,16 @@ export default function Maps() {
       null,
       2
     );
+    const formattedJsonStringProfile = JSON.stringify(
+      machineProfileMessage,
+      null,
+      2
+    );
     const encryptedIdMessage = encryptMessage(formattedJsonStringId);
     const encryptedProductivityMessage = encryptMessage(
       formattedJsonStringProductivity
     );
+    const encryptedProfileMessage = encryptMessage(formattedJsonStringProfile);
 
     const payloadId = {
       apikey: API_KEY,
@@ -145,42 +162,63 @@ export default function Maps() {
       message: encryptedProductivityMessage,
     };
 
+    const payloadProfile = {
+      apikey: API_KEY,
+      uniqueid: IV,
+      timestamp: new Date().toISOString().replace(/[-:.TZ]/g, ""),
+      localdb: "N",
+      message: encryptedProfileMessage,
+    };
+
     try {
-      const [responseId, responseProductivity] = await Promise.all([
-        axios.post(API_URL, payloadId, {
-          headers: { "Content-Type": "application/json" },
-        }),
-        axios.post(API_URL, payloadProductivity, {
-          headers: { "Content-Type": "application/json" },
-        }),
-      ]);
+      const [responseId, responseProductivity, responseProfile] =
+        await Promise.all([
+          axios.post(API_URL, payloadId, {
+            headers: { "Content-Type": "application/json" },
+          }),
+          axios.post(API_URL, payloadProductivity, {
+            headers: { "Content-Type": "application/json" },
+          }),
+          axios.post(API_URL, payloadProfile, {
+            headers: { "Content-Type": "application/json" },
+          }),
+        ]);
 
       console.log("ResponseId:", responseId);
       console.log("ResponseProductivity:", responseProductivity);
 
       if (
         responseId.data.code == 200 &&
-        responseProductivity.data.code == 200
+        responseProductivity.data.code == 200 &&
+        responseProfile.data.code == 200
       ) {
         const decryptedIdData = decryptMessage(responseId.data.message);
         const decryptedProductivityData = decryptMessage(
           responseProductivity.data.message
         );
+        const decryptedProfileData = decryptMessage(
+          responseProfile.data.message
+        );
 
         console.log("Decrypted ID Data:", decryptedIdData);
         console.log("Decrypted Productivity Data:", decryptedProductivityData);
+        console.log("Decrypted Profile Data:", decryptedProfileData);
 
         const parsedIdData = JSON.parse(decryptedIdData);
         const parsedProductivityData = JSON.parse(decryptedProductivityData);
+        const parsedProfileData = JSON.parse(decryptedProfileData);
 
         if (
           Array.isArray(parsedIdData.data) &&
-          Array.isArray(parsedProductivityData.data)
+          Array.isArray(parsedProductivityData.data) &&
+          Array.isArray(parsedProfileData.data)
         ) {
           setApiData(parsedIdData.data);
           setProductivityData(parsedProductivityData.data);
+          setProfileData(parsedProfileData.data);
         } else {
           console.log("Invalid data format in API response.");
+          console.log("Invalid data format in profile API response.");
         }
       } else {
         console.log(
@@ -202,14 +240,14 @@ export default function Maps() {
 
   const getLatestOutputCapacity = (objectId: string) => {
     const relevantData = productivityData
-      .filter((data) => data.objectid === objectId && data.enddate) // Filter by objectid and valid enddate
+      .filter((data) => data.objectid === objectId && data.enddate)
       .sort(
         (a, b) => new Date(b.enddate).getTime() - new Date(a.enddate).getTime()
-      ); // Sort by enddate descending
+      );
 
     return relevantData.length > 0
       ? parseFloat(relevantData[0].outputcapacity)
-      : 0; // Return the latest output capacity
+      : 0;
   };
 
   const calculateAverageCapacity = () => {
@@ -264,17 +302,24 @@ export default function Maps() {
         <MapContainer
           center={[-7.9697253, 112.611356]}
           maxZoom={18}
-          minZoom={3}
+          minZoom={2}
           zoom={7}
           scrollWheelZoom={true}
           attributionControl={false}
           style={{ width: "100%", height: "25rem", zIndex: "10" }}
         >
-          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          <TileLayer url="https://api.maptiler.com/maps/openstreetmap/256/{z}/{x}/{y}.jpg?key=PbC0ffSFZNqfx0BMRVNz" />
           {!isLoading &&
             apiData.map((machine) => {
               const lat = parseFloat(machine.lat.replace(",", "."));
               const long = parseFloat(machine.long.replace(",", "."));
+
+              const vendorProfile = profileData.find(
+                (profile) => profile.objectid === machine.objectid
+              );
+              const vendorName = vendorProfile
+                ? vendorProfile.vendor
+                : "Vendor Not Available";
 
               const productivity = productivityData.find(
                 (prod) => prod.objectid === machine.objectid
@@ -438,6 +483,19 @@ export default function Maps() {
                                       </span>
                                       <span className="ml-4 font-semibold text-base">
                                         {machine.regionid}
+                                      </span>
+                                    </div>
+                                  </li>
+                                  <li>
+                                    <div className="flex items-center">
+                                      <h1 className="text-lg font-semibold text-black w-32">
+                                        Vendor
+                                      </h1>
+                                      <span className="text-lg font-semibold text-black">
+                                        :
+                                      </span>
+                                      <span className="ml-4 font-semibold text-base">
+                                        {vendorName}
                                       </span>
                                     </div>
                                   </li>
