@@ -76,7 +76,7 @@ export default function Chart({ data }: { data: any[] }) {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
-                  className="bg-[#f39512] focus:outline-[#f39512] text-[#fff] hover:bg-[#d27f0f] hover:text-[#fff]"
+                  className="bg-flamePhoenix focus:outline-flamePhoenix text-white hover:bg-flamePhoenix hover:text-white"
                 >
                   {selectedObjectCode
                     ? selectedObjectCode
@@ -105,7 +105,7 @@ export default function Chart({ data }: { data: any[] }) {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
-                  className="bg-[#f39512] outline-[#f39512] text-[#fff] hover:bg-[#d27f0f] hover:text-[#fff]"
+                  className="bg-flamePhoenix outline-flamePhoenix text-white hover:bg-emberPhoenix hover:text-white"
                 >
                   {selectedValue === "outputcapacity"
                     ? "Output Capacity"

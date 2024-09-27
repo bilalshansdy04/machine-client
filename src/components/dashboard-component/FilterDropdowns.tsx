@@ -52,7 +52,7 @@ export const FilterDropdowns: React.FC<FilterDropdownsProps> = ({
       {Object.keys(uniqueValues).map((field) => (
         <DropdownMenu key={field}>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="bg-[#f39512] outline-[#f39512] text-[#fff] hover:bg-[#d27f0f] hover:text-[#fff]">
+            <Button variant="outline" className="bg-flamePhoenix outline-flamePhoenix text-white hover:bg-emberPhoenix hover:text-white">
               Filter by{" "}
               {
                 fieldLabels[

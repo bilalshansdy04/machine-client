@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
-import CryptoJS from "crypto-js";
+import { encryptMessage, decryptMessage } from "../../utils/aes256.ts";
 import {
   Table,
   TableBody,
@@ -29,32 +29,9 @@ export interface MachineRecord {
 }
 
 const API_URL = import.meta.env.VITE_MACHINE_PRODUCTIVITY_URL;
-const SECRET_KEY = import.meta.env.VITE_SECRET_KEY;
 const IV = import.meta.env.VITE_IV;
 const API_KEY = import.meta.env.VITE_API_KEY;
 
-const encryptMessage = (message: string): string => {
-  const key = CryptoJS.enc.Utf8.parse(SECRET_KEY);
-  const ivHex = CryptoJS.enc.Utf8.parse(IV);
-  const encrypted = CryptoJS.AES.encrypt(message, key, {
-    iv: ivHex,
-    mode: CryptoJS.mode.CBC,
-    padding: CryptoJS.pad.Pkcs7,
-  });
-  return encrypted.ciphertext.toString(CryptoJS.enc.Hex).toUpperCase();
-};
-
-const decryptMessage = (encryptedMessage: string): string => {
-  const key = CryptoJS.enc.Utf8.parse(SECRET_KEY);
-  const ivHex = CryptoJS.enc.Utf8.parse(IV);
-  const encrypted = CryptoJS.enc.Hex.parse(encryptedMessage);
-  const decrypted = CryptoJS.AES.decrypt({ ciphertext: encrypted }, key, {
-    iv: ivHex,
-    mode: CryptoJS.mode.CBC,
-    padding: CryptoJS.pad.Pkcs7,
-  });
-  return decrypted.toString(CryptoJS.enc.Utf8);
-};
 
 export default function RecordTable() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -189,7 +166,7 @@ export default function RecordTable() {
               <Button
                 type="button"
                 onClick={handleSearchSubmit}
-                className="bg-[#385878] text-[#fff] hover:bg-[#2d475f]"
+                className="bg-oceanKnight text-white hover:bg-abyssKnight"
               >
                 <svg
                   fill="none"
