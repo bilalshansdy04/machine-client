@@ -2,6 +2,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { useEffect } from "react";
+import NavbarGuide from "./NavbarGuide";
 
 const Root = () => {
   const location = useLocation();
@@ -12,8 +13,8 @@ const Root = () => {
       case "/":
         document.title = "Dashboard | Home";
         break;
-      case "/maps":
-        document.title = "Dashboard | Maps";
+      case "/guide":
+        document.title = "Dashboard | Guide";
         break;
       default:
         document.title = "Dashboard";
@@ -24,10 +25,16 @@ const Root = () => {
   return (
     <div>
       <Navbar />
-      <div className="px-36 pt-10 pb-20 bg-[#eff3f8]">
+      <div
+        className={`${
+          location.pathname === "/guide"
+            ? "px-0 pt-0 pb-0 bg-white"
+            : "px-36 pt-10 pb-20 bg-[#eff3f8]"
+        }`}
+      >
         <Outlet />
       </div>
-      <Footer/>
+      <Footer />
     </div>
   );
 };
