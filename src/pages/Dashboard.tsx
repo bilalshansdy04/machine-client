@@ -5,6 +5,8 @@ import { ProductivityTable } from "@/components/dashboard-component/Productivity
 import Chart from "@/components/dashboard-component/Chart";
 import Maps from "@/components/dashboard-component/Maps";
 import RecordTable from "@/components/dashboard-component/RecordTable";
+import { Question } from "@phosphor-icons/react";
+import { Link } from "react-router-dom";
 
 export interface MachineProductivity {
   objectid: string;
@@ -162,13 +164,31 @@ export default function Dashboard() {
         </div>
       </section>
       <section>
-      <div
-        className="w-full h-[34rem] rounded-xl bg-white px-10 pt-10 pb-16 shadow scroll-mt-28"
-        id="maps"
-      >
-        <Maps />
-      </div>
+        <div
+          className="w-full h-[34rem] rounded-xl bg-white px-10 pt-10 pb-16 shadow scroll-mt-28"
+          id="maps"
+        >
+          <Maps />
+        </div>
       </section>
+      <div className="fixed bottom-10 right-10">
+        <Link to="/guide">
+          <div className="relative group">
+            {/* Tombol dengan icon dan tulisan */}
+            <div className="bg-flamePhoenix text-white rounded-full w-12 h-12 flex items-center justify-center transition-all duration-300 group-hover:w-32 hover:rounded-full shadow-lg overflow-hidden">
+              {/* Icon tanda tanya */}
+              <Question
+                size={32}
+                className="transition-transform duration-300 group-hover:mr-2"
+              />
+              {/* Teks Guide yang muncul saat di hover */}
+              <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 group-hover:inline-block hidden">
+                Guide
+              </span>
+            </div>
+          </div>
+        </Link>
+      </div>
     </div>
   );
 }

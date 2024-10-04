@@ -39,6 +39,7 @@ export interface MachineProfile {
 }
 
 export interface MachineProductivity {
+  id: number;
   objecttype: string;
   objectgroup: string;
   objectid: string;
@@ -93,7 +94,7 @@ export default function Maps() {
       group: "XCYTUA",
       property: "PJLBBS",
       fields:
-        "objecttype, objectgroup, objectid, outputcapacity, startdate, enddate",
+        "id, objecttype, objectgroup, objectid, outputcapacity, startdate, enddate",
       pageno: "0",
       recordperpage: "50",
       condition: {
@@ -184,9 +185,6 @@ export default function Maps() {
           }),
         ]);
 
-      console.log("ResponseId:", responseId);
-      console.log("ResponseProductivity:", responseProductivity);
-
       if (
         responseId.data.code == 200 &&
         responseProductivity.data.code == 200 &&
@@ -199,10 +197,6 @@ export default function Maps() {
         const decryptedProfileData = decryptMessage(
           responseProfile.data.message
         );
-
-        console.log("Decrypted ID Data:", decryptedIdData);
-        console.log("Decrypted Productivity Data:", decryptedProductivityData);
-        console.log("Decrypted Profile Data:", decryptedProfileData);
 
         const parsedIdData = JSON.parse(decryptedIdData);
         const parsedProductivityData = JSON.parse(decryptedProductivityData);
@@ -250,6 +244,52 @@ export default function Maps() {
       : 0;
   };
 
+  const findTopOutputCapacityMachines = () => {
+    console.log("Function called");
+
+    if (productivityData.length === 0) {
+      console.log("No data available");
+      return [];
+    }
+
+    const latestCapacities = {};
+
+    productivityData.forEach((data) => {
+      const objectId = data.objectid;
+      const latestCapacity = getLatestOutputCapacity(objectId);
+
+      if (
+        !latestCapacities[objectId] ||
+        latestCapacity > latestCapacities[objectId]
+      ) {
+        latestCapacities[objectId] = latestCapacity;
+      }
+    });
+
+    console.log("Latest Capacities by Object ID:", latestCapacities);
+
+    const maxCapacity = Math.max(...Object.values(latestCapacities));
+    console.log("Max Capacity:", maxCapacity);
+
+    const topMachines = productivityData.filter((machine) => {
+      const objectId = machine.objectid;
+      return latestCapacities[objectId] === maxCapacity;
+    });
+
+    console.log("Top Machines:", topMachines);
+
+    if (topMachines.length === 0) {
+      console.log("No machines found with max capacity");
+    } else {
+      console.log("Machines with Max Capacity:", topMachines);
+      topMachines.forEach((machine) => {
+        console.log("Object ID of Top Capacity Machine:", machine.objectid);
+      });
+    }
+
+    return topMachines;
+  };
+
   const calculateAverageCapacity = () => {
     const latestCapacities: { [key: string]: number } = {};
 
@@ -276,19 +316,44 @@ export default function Maps() {
       : 0;
   };
 
-  const blueIcon = new L.divIcon({
+  const topOutputCapacity = Math.max(
+    ...productivityData.map((data) => parseFloat(data.outputcapacity) || 0)
+  );
+  console.log("Top Output Capacity:", topOutputCapacity);
+
+  const topMachines = productivityData.filter(
+    (machine) => parseFloat(machine.outputcapacity) === topOutputCapacity
+  );
+  console.log("Top Machines:", topMachines);
+
+  const blueIcon = L.divIcon({
     className: "custom-icon",
     html: '<i class="fas fa-map-marker-alt" style="color: #063599; font-size: 32px;"></i>',
     iconSize: [32, 32],
     iconAnchor: [16, 32],
   });
 
-  const redIcon = new L.divIcon({
+  const redIcon = L.divIcon({
     className: "custom-icon",
     html: '<i class="fas fa-map-marker-alt" style="color: #910d06; font-size: 32px;"></i>',
     iconSize: [32, 32],
     iconAnchor: [16, 32],
   });
+
+const starOffsetX = 10; 
+const starOffsetY = -10; 
+
+const starIcon = L.divIcon({
+    className: "custom-icon",
+    html: `<div style="position: relative; width: 32px; height: 32px;">
+                <i class="fas fa-star" style="color: #FFD700; font-size: 16px; position: absolute; top: ${starOffsetY}px; left: ${starOffsetX}px;"></i>
+                <i class="fas fa-map-marker-alt" style="color: #063599; font-size: 32px;"></i>
+            </div>`,
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+});
+
+  const topOutputMachine = findTopOutputCapacityMachines();
 
   return (
     <div className="relative space-y-3">
@@ -308,7 +373,7 @@ export default function Maps() {
           attributionControl={false}
           style={{ width: "100%", height: "25rem", zIndex: "10" }}
         >
-          <TileLayer url="https://api.maptiler.com/maps/openstreetmap/256/{z}/{x}/{y}.jpg?key=PbC0ffSFZNqfx0BMRVNz" />
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           {!isLoading &&
             apiData.map((machine) => {
               const lat = parseFloat(machine.lat.replace(",", "."));
@@ -321,20 +386,22 @@ export default function Maps() {
                 ? vendorProfile.vendor
                 : "Vendor Not Available";
 
-              const productivity = productivityData.find(
-                (prod) => prod.objectid === machine.objectid
+              const outputCapacity = getLatestOutputCapacity(machine.objectid);
+              const average = calculateAverageCapacity(machine.objectid);
+
+              const isTopMachine = topOutputMachine.some(
+                (topMachine) => topMachine.objectid === machine.objectid
               );
-
-              // const outputCapacity = productivity
-              // ? parseFloat(productivity.outputcapacity)
-              // : 0;
-
-              const outputCapacity = getLatestOutputCapacity(machine.objectid); // Get the latest output capacity
-              const average = calculateAverageCapacity(machine.objectid); // Calculate average capacity
-
+              console.log(
+                `Machine ${machine.objectname} is top machine: ${isTopMachine}`
+              );
               const textColor =
                 outputCapacity > average ? "text-blue-600" : "text-red-600";
-              const icon = outputCapacity > average ? blueIcon : redIcon;
+              const icon = isTopMachine
+                ? starIcon
+                : outputCapacity > average
+                ? blueIcon
+                : redIcon;
 
               return (
                 <Marker key={machine.id} position={[lat, long]} icon={icon}>
