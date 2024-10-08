@@ -1,8 +1,5 @@
-import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import axios from "axios";
 import { useEffect, useState } from "react";
-import { encryptMessage, decryptMessage } from "../../utils/aes256.ts";
+import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import {
   Dialog,
   DialogContent,
@@ -11,225 +8,28 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import L from "leaflet";
-
-export interface MachineId {
-  id: number;
-  lat: string;
-  long: string;
-  objecttype: string;
-  objectgroup: string;
-  objectid: string;
-  objectname: string;
-  icongroup: string;
-  iconid: string;
-  countryid: string;
-  stateid: string;
-  cityid: string;
-  regionid: string;
-}
-
-export interface MachineProfile {
-  id: number;
-  objecttype: string;
-  objectgroup: string;
-  objectid: string;
-  objectcode: string;
-  vendor: string;
-}
-
-export interface MachineProductivity {
-  id: number;
-  objecttype: string;
-  objectgroup: string;
-  objectid: string;
-  outputcapacity: number;
-  outputuom: string;
-  outputtime: string;
-  outputcost: number;
-  startdate: string;
-  enddate: string;
-  objectstatus: string;
-}
-
-const API_URL = import.meta.env.VITE_MACHINE_PRODUCTIVITY_URL;
-const IV = import.meta.env.VITE_IV;
-const API_KEY = import.meta.env.VITE_API_KEY;
+import { fetchData } from "../../utils/fetchData/maps-fetchData.ts";
+import { blueIcon, redIcon, starIcon } from "../map-ui/MapIcons.ts";
+import "leaflet/dist/leaflet.css";
 
 export default function Maps() {
-  const [apiData, setApiData] = useState<MachineId[]>([]);
-  const [productivityData, setProductivityData] = useState<
-    MachineProductivity[]
-  >([]);
-  const [profileData, setProfileData] = useState<MachineProfile[]>([]);
+  const [apiData, setApiData] = useState([]);
+  const [productivityData, setProductivityData] = useState([]);
+  const [profileData, setProfileData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchData = async () => {
-    const machineIdMessage = {
-      datacore: "MACHINE",
-      folder: "MACHINEID",
-      command: "SELECT",
-      group: "XCYTUA",
-      property: "PJLBBS",
-      fields:
-        "objecttype, objectgroup, objectid, objectname, icongroup, iconid, countryid, stateid, cityid, regionid, lat, long, active",
-      pageno: "0",
-      recordperpage: "50",
-      condition: {
-        objectname: {
-          operator: "like",
-          value: "%",
-        },
-        active: {
-          operator: "eq",
-          value: "Y",
-        },
-      },
-    };
-
-    const machineProductivityMessage = {
-      datacore: "MACHINE",
-      folder: "MACHINEPRODUCTIVITY",
-      command: "SELECT",
-      group: "XCYTUA",
-      property: "PJLBBS",
-      fields:
-        "id, objecttype, objectgroup, objectid, outputcapacity, startdate, enddate",
-      pageno: "0",
-      recordperpage: "50",
-      condition: {
-        objecttype: {
-          operator: "like",
-          value: "%",
-        },
-        active: {
-          operator: "eq",
-          value: "Y",
-        },
-      },
-    };
-
-    const machineProfileMessage = {
-      datacore: "MACHINE",
-      folder: "MACHINEPROFILE",
-      command: "SELECT",
-      group: "XCYTUA",
-      property: "PJLBBS",
-      fields: "objecttype, objectgroup, objectid, vendor",
-      pageno: "0",
-      recordperpage: "50",
-      condition: {
-        objecttype: {
-          operator: "like",
-          value: "%",
-        },
-        active: {
-          operator: "eq",
-          value: "Y",
-        },
-      },
-    };
-
-    const formattedJsonStringId = JSON.stringify(machineIdMessage, null, 2);
-    const formattedJsonStringProductivity = JSON.stringify(
-      machineProductivityMessage,
-      null,
-      2
-    );
-    const formattedJsonStringProfile = JSON.stringify(
-      machineProfileMessage,
-      null,
-      2
-    );
-    const encryptedIdMessage = encryptMessage(formattedJsonStringId);
-    const encryptedProductivityMessage = encryptMessage(
-      formattedJsonStringProductivity
-    );
-    const encryptedProfileMessage = encryptMessage(formattedJsonStringProfile);
-
-    const payloadId = {
-      apikey: API_KEY,
-      uniqueid: IV,
-      timestamp: new Date().toISOString().replace(/[-:.TZ]/g, ""),
-      localdb: "N",
-      message: encryptedIdMessage,
-    };
-
-    const payloadProductivity = {
-      apikey: API_KEY,
-      uniqueid: IV,
-      timestamp: new Date().toISOString().replace(/[-:.TZ]/g, ""),
-      localdb: "N",
-      message: encryptedProductivityMessage,
-    };
-
-    const payloadProfile = {
-      apikey: API_KEY,
-      uniqueid: IV,
-      timestamp: new Date().toISOString().replace(/[-:.TZ]/g, ""),
-      localdb: "N",
-      message: encryptedProfileMessage,
-    };
-
-    try {
-      const [responseId, responseProductivity, responseProfile] =
-        await Promise.all([
-          axios.post(API_URL, payloadId, {
-            headers: { "Content-Type": "application/json" },
-          }),
-          axios.post(API_URL, payloadProductivity, {
-            headers: { "Content-Type": "application/json" },
-          }),
-          axios.post(API_URL, payloadProfile, {
-            headers: { "Content-Type": "application/json" },
-          }),
-        ]);
-
-      if (
-        responseId.data.code == 200 &&
-        responseProductivity.data.code == 200 &&
-        responseProfile.data.code == 200
-      ) {
-        const decryptedIdData = decryptMessage(responseId.data.message);
-        const decryptedProductivityData = decryptMessage(
-          responseProductivity.data.message
-        );
-        const decryptedProfileData = decryptMessage(
-          responseProfile.data.message
-        );
-
-        const parsedIdData = JSON.parse(decryptedIdData);
-        const parsedProductivityData = JSON.parse(decryptedProductivityData);
-        const parsedProfileData = JSON.parse(decryptedProfileData);
-
-        if (
-          Array.isArray(parsedIdData.data) &&
-          Array.isArray(parsedProductivityData.data) &&
-          Array.isArray(parsedProfileData.data)
-        ) {
-          setApiData(parsedIdData.data);
-          setProductivityData(parsedProductivityData.data);
-          setProfileData(parsedProfileData.data);
-        } else {
-          console.log("Invalid data format in API response.");
-          console.log("Invalid data format in profile API response.");
-        }
-      } else {
-        console.log(
-          "Invalid response code:",
-          responseId.data.code,
-          responseProductivity.data.code
-        );
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchData();
+    const fetchAndSetData = async () => {
+      const data = await fetchData();
+      if (data) {
+        setApiData(data.apiData);
+        setProductivityData(data.productivityData);
+        setProfileData(data.profileData);
+      }
+      setIsLoading(false);
+    };
+
+    fetchAndSetData();
   }, []);
 
   const getLatestOutputCapacity = (objectId: string) => {
@@ -325,33 +125,6 @@ export default function Maps() {
     (machine) => parseFloat(machine.outputcapacity) === topOutputCapacity
   );
   console.log("Top Machines:", topMachines);
-
-  const blueIcon = L.divIcon({
-    className: "custom-icon",
-    html: '<i class="fas fa-map-marker-alt" style="color: #063599; font-size: 32px;"></i>',
-    iconSize: [32, 32],
-    iconAnchor: [16, 32],
-  });
-
-  const redIcon = L.divIcon({
-    className: "custom-icon",
-    html: '<i class="fas fa-map-marker-alt" style="color: #910d06; font-size: 32px;"></i>',
-    iconSize: [32, 32],
-    iconAnchor: [16, 32],
-  });
-
-const starOffsetX = 10; 
-const starOffsetY = -10; 
-
-const starIcon = L.divIcon({
-    className: "custom-icon",
-    html: `<div style="position: relative; width: 32px; height: 32px;">
-                <i class="fas fa-star" style="color: #FFD700; font-size: 16px; position: absolute; top: ${starOffsetY}px; left: ${starOffsetX}px;"></i>
-                <i class="fas fa-map-marker-alt" style="color: #063599; font-size: 32px;"></i>
-            </div>`,
-    iconSize: [32, 32],
-    iconAnchor: [16, 32],
-});
 
   const topOutputMachine = findTopOutputCapacityMachines();
 

@@ -1,12 +1,15 @@
 import { useState, useEffect, useMemo } from "react";
-import axios from "axios";
 import { encryptMessage, decryptMessage } from "@/utils/aes256";
 import { ProductivityTable } from "@/components/dashboard-component/ProductivityTable";
+import { Question } from "@phosphor-icons/react";
+import { Link } from "react-router-dom";
+import { jsonData } from "../utils/message/dashboard-message.ts";
+
+import axios from "axios";
+
 import Chart from "@/components/dashboard-component/Chart";
 import Maps from "@/components/dashboard-component/Maps";
 import RecordTable from "@/components/dashboard-component/RecordTable";
-import { Question } from "@phosphor-icons/react";
-import { Link } from "react-router-dom";
 
 export interface MachineProductivity {
   objectid: string;
@@ -47,28 +50,6 @@ export default function Dashboard() {
 
   const fetchData = async () => {
     setIsLoading(true);
-
-    const jsonData = {
-      datacore: "MACHINE",
-      folder: "MACHINEPRODUCTIVITY",
-      command: "SELECT",
-      group: "XCYTUA",
-      property: "PJLBBS",
-      fields:
-        "objecttype,objectgroup,objectid,objectcode,outputcapacity,outputuom,outputtime,outputcost,startdate,enddate,objectstatus",
-      pageno: "0",
-      recordperpage: "999999999999",
-      condition: {
-        objecttype: {
-          operator: "like",
-          value: "%",
-        },
-        active: {
-          operator: "eq",
-          value: "Y",
-        },
-      },
-    };
 
     const formattedJsonString = JSON.stringify(jsonData, null, 2);
     const encryptedMessage = encryptMessage(formattedJsonString);
