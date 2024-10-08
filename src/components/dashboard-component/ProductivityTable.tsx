@@ -46,10 +46,22 @@ export const ProductivityTable: React.FC<ProductivityTableProps> = ({
     setCurrentPage(1);
   };
 
-  // Filter the data based on the confirmed search term
   const filteredAndSearchedData = filteredData.filter((productivity) => {
+    // Menerapkan filter dari dropdown
+    const dropdownFiltersMatch = Object.keys(selectedFilters).every((key) => {
+      const field = key as keyof MachineProductivity;
+      const filterValue = selectedFilters[field];
+  
+      // Jika filter kosong atau tidak diset, abaikan filter ini (anggap semua data cocok)
+      if (!filterValue || filterValue === "") return true;
+  
+      // Cocokkan dengan nilai data jika filter aktif
+      return productivity[field].toString() === filterValue;
+    });
+  
+    // Menerapkan filter pencarian
     const searchInLower = confirmedSearchTerm.toLowerCase();
-    return (
+    const searchMatch =
       productivity.objecttype.toLowerCase().includes(searchInLower) ||
       productivity.objectid.toLowerCase().includes(searchInLower) ||
       productivity.objectgroup.toLowerCase().includes(searchInLower) ||
@@ -66,11 +78,16 @@ export const ProductivityTable: React.FC<ProductivityTableProps> = ({
         .includes(searchInLower) ||
       productivity.startdate.toLowerCase().includes(searchInLower) ||
       productivity.enddate.toLowerCase().includes(searchInLower) ||
-      productivity.objectstatus.toLowerCase().includes(searchInLower)
-    );
+      productivity.objectstatus.toLowerCase().includes(searchInLower);
+  
+    // Pastikan data cocok dengan filter dropdown dan pencarian
+    return dropdownFiltersMatch && searchMatch;
   });
+  
+  
+  
 
-  // Calculate the data to be shown on the current page
+  // Hitung data yang ditampilkan pada halaman saat ini
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentData = filteredAndSearchedData.slice(
@@ -78,7 +95,7 @@ export const ProductivityTable: React.FC<ProductivityTableProps> = ({
     indexOfLastItem
   );
 
-  // Calculate total pages
+  // Hitung total halaman
   const totalPages = Math.ceil(filteredAndSearchedData.length / itemsPerPage);
 
   const handlePageChange = (
@@ -87,6 +104,7 @@ export const ProductivityTable: React.FC<ProductivityTableProps> = ({
   ) => {
     setCurrentPage(pageNumber);
   };
+
   if (isLoading) {
     return (
       <div>
