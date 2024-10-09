@@ -46,31 +46,44 @@ export const ProductivityTable: React.FC<ProductivityTableProps> = ({
     setCurrentPage(1);
   };
 
-  // Filter the data based on the confirmed search term
   const filteredAndSearchedData = filteredData.filter((productivity) => {
+    const dropdownFiltersMatch = Object.keys(selectedFilters).every((key) => {
+      const field = key as keyof MachineProductivity;
+      const filterValue = selectedFilters[field];
+
+      if (filterValue === `All ${fieldLabels[field]}`) return true;
+      if (!filterValue || filterValue === "") return true;
+
+      if (field === "outputcapacity") {
+        return (
+          parseFloat(productivity[field].toString()) === parseFloat(filterValue)
+        );
+      }
+
+      return productivity[field].toString() === filterValue;
+    });
+
     const searchInLower = confirmedSearchTerm.toLowerCase();
-    return (
+    const searchMatch =
       productivity.objecttype.toLowerCase().includes(searchInLower) ||
       productivity.objectid.toLowerCase().includes(searchInLower) ||
       productivity.objectgroup.toLowerCase().includes(searchInLower) ||
       productivity.objectcode.toLowerCase().includes(searchInLower) ||
-      productivity.outputcapacity
+      parseFloat(productivity.outputcapacity.toString())
         .toString()
-        .toLowerCase()
-        .includes(searchInLower) ||
+        .includes(searchInLower) || // <-- Update di sini
       productivity.outputuom.toLowerCase().includes(searchInLower) ||
       productivity.outputtime.toLowerCase().includes(searchInLower) ||
-      productivity.outputcost
+      parseFloat(productivity.outputcost.toString())
         .toString()
-        .toLowerCase()
-        .includes(searchInLower) ||
+        .includes(searchInLower) || // <-- Update di sini
       productivity.startdate.toLowerCase().includes(searchInLower) ||
       productivity.enddate.toLowerCase().includes(searchInLower) ||
-      productivity.objectstatus.toLowerCase().includes(searchInLower)
-    );
+      productivity.objectstatus.toLowerCase().includes(searchInLower);
+
+    return dropdownFiltersMatch && searchMatch;
   });
 
-  // Calculate the data to be shown on the current page
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentData = filteredAndSearchedData.slice(
@@ -78,7 +91,6 @@ export const ProductivityTable: React.FC<ProductivityTableProps> = ({
     indexOfLastItem
   );
 
-  // Calculate total pages
   const totalPages = Math.ceil(filteredAndSearchedData.length / itemsPerPage);
 
   const handlePageChange = (
@@ -87,6 +99,7 @@ export const ProductivityTable: React.FC<ProductivityTableProps> = ({
   ) => {
     setCurrentPage(pageNumber);
   };
+
   if (isLoading) {
     return (
       <div>
@@ -172,10 +185,12 @@ export const ProductivityTable: React.FC<ProductivityTableProps> = ({
                 <TableCell>{productivity.objectid.trim()}</TableCell>
                 <TableCell>{productivity.objectgroup.trim()}</TableCell>
                 <TableCell>{productivity.objectcode.trim()}</TableCell>
-                <TableCell>{productivity.outputcapacity}</TableCell>
+                <TableCell>
+                  {parseFloat(productivity.outputcapacity).toString()}
+                </TableCell>
                 <TableCell>{productivity.outputuom.trim()}</TableCell>
                 <TableCell>{productivity.outputtime.trim()}</TableCell>
-                <TableCell>{productivity.outputcost}</TableCell>
+                <TableCell>{parseFloat(productivity.outputcost)}</TableCell>
                 <TableCell>{productivity.startdate}</TableCell>
                 <TableCell>{productivity.enddate}</TableCell>
                 <TableCell>{productivity.objectstatus.trim()}</TableCell>

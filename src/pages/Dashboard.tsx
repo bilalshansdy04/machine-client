@@ -28,15 +28,15 @@ const API_URL = import.meta.env.VITE_MACHINE_PRODUCTIVITY_URL;
 const IV = import.meta.env.VITE_IV;
 const API_KEY = import.meta.env.VITE_API_KEY;
 
-// Definisi fieldLabels
-const fieldLabels = {
-  objecttype: "Object Type",
-  objectid: "Object ID",
-  objectgroup: "Object Group",
-  objectcode: "Object Code",
-  outputcapacity: "Output Capacity",
-  startdate: "Start Date",
+const fieldLabels: { [key in keyof MachineProductivity]: string } = {
+  objecttype: "Object Types",
+  objectid: "Object IDs",
+  objectgroup: "Object Groups",
+  objectcode: "Object Codes",
+  outputcapacity: "Capacities",
+  startdate: "Dates",
 };
+
 
 export default function Dashboard() {
   const [selectedFilters, setSelectedFilters] = useState<
@@ -81,9 +81,6 @@ export default function Dashboard() {
       message: encryptedMessage,
     };
 
-    // Log the formatted message
-    // console.log("format message", JSON.stringify(payload, null, 2));
-
     try {
       const response = await axios.post(API_URL, payload, {
         headers: {
@@ -94,7 +91,6 @@ export default function Dashboard() {
       if (response.data.code == 200) {
         const decryptedData = decryptMessage(response.data.message);
         const parsedData = JSON.parse(decryptedData);
-        // console.log("decrypted data:", decryptedData)
         if (Array.isArray(parsedData.data)) {
           setApiData(parsedData.data);
         }
@@ -113,15 +109,18 @@ export default function Dashboard() {
   }, []);
 
   const uniqueValues = useMemo(() => {
+    const sortedOutputCapacity = getUniqueValues(apiData, "outputcapacity")
+      .map(Number)
+      .filter((val) => !isNaN(val))
+      .sort((a, b) => a - b)
+      .map(String);
+
     return {
       objecttype: ["All Types", ...getUniqueValues(apiData, "objecttype")],
       objectid: ["All IDs", ...getUniqueValues(apiData, "objectid")],
       objectgroup: ["All Groups", ...getUniqueValues(apiData, "objectgroup")],
       objectcode: ["All Codes", ...getUniqueValues(apiData, "objectcode")],
-      outputcapacity: [
-        "All Capacities",
-        ...getUniqueValues(apiData, "outputcapacity"),
-      ],
+      outputcapacity: ["All Capacities", ...sortedOutputCapacity],
       startdate: ["All Dates", ...getUniqueValues(apiData, "startdate")],
     };
   }, [apiData]);
@@ -174,14 +173,11 @@ export default function Dashboard() {
       <div className="fixed bottom-10 right-10">
         <Link to="/guide">
           <div className="relative group">
-            {/* Tombol dengan icon dan tulisan */}
             <div className="bg-flamePhoenix text-white rounded-full w-12 h-12 flex items-center justify-center transition-all duration-300 group-hover:w-32 hover:rounded-full shadow-lg overflow-hidden">
-              {/* Icon tanda tanya */}
               <Question
                 size={32}
                 className="transition-transform duration-300 group-hover:mr-2"
               />
-              {/* Teks Guide yang muncul saat di hover */}
               <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 group-hover:inline-block hidden">
                 Guide
               </span>
@@ -198,12 +194,10 @@ const getUniqueValues = (
   field: keyof MachineProductivity
 ): string[] => {
   const values = data.map((item) => {
-    if (field === "objecttype") return item.objecttype.trim();
-    if (field === "objectgroup") return item.objectgroup.trim();
-    if (field === "objectid") return item.objectid.trim();
-    if (field === "objectcode") return item.objectcode.trim();
-    return item[field]?.toString() || ""; // Handle fields with a string fallback
+    if (field === "outputcapacity") return item.outputcapacity || "0";
+    if (field === "startdate") return item.startdate || "";
+    return item[field]?.toString() || ""; 
   });
 
-  return Array.from(new Set(values)).filter((val) => val !== ""); // Remove duplicates and empty values
+  return Array.from(new Set(values)).filter((val) => val !== "");
 };
