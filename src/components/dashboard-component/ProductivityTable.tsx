@@ -47,47 +47,43 @@ export const ProductivityTable: React.FC<ProductivityTableProps> = ({
   };
 
   const filteredAndSearchedData = filteredData.filter((productivity) => {
-    // Menerapkan filter dari dropdown
     const dropdownFiltersMatch = Object.keys(selectedFilters).every((key) => {
       const field = key as keyof MachineProductivity;
       const filterValue = selectedFilters[field];
-  
-      // Jika filter kosong atau tidak diset, abaikan filter ini (anggap semua data cocok)
+
+      if (filterValue === `All ${fieldLabels[field]}`) return true;
       if (!filterValue || filterValue === "") return true;
-  
-      // Cocokkan dengan nilai data jika filter aktif
+
+      if (field === "outputcapacity") {
+        return (
+          parseFloat(productivity[field].toString()) === parseFloat(filterValue)
+        );
+      }
+
       return productivity[field].toString() === filterValue;
     });
-  
-    // Menerapkan filter pencarian
+
     const searchInLower = confirmedSearchTerm.toLowerCase();
     const searchMatch =
       productivity.objecttype.toLowerCase().includes(searchInLower) ||
       productivity.objectid.toLowerCase().includes(searchInLower) ||
       productivity.objectgroup.toLowerCase().includes(searchInLower) ||
       productivity.objectcode.toLowerCase().includes(searchInLower) ||
-      productivity.outputcapacity
+      parseFloat(productivity.outputcapacity.toString())
         .toString()
-        .toLowerCase()
-        .includes(searchInLower) ||
+        .includes(searchInLower) || // <-- Update di sini
       productivity.outputuom.toLowerCase().includes(searchInLower) ||
       productivity.outputtime.toLowerCase().includes(searchInLower) ||
-      productivity.outputcost
+      parseFloat(productivity.outputcost.toString())
         .toString()
-        .toLowerCase()
-        .includes(searchInLower) ||
+        .includes(searchInLower) || // <-- Update di sini
       productivity.startdate.toLowerCase().includes(searchInLower) ||
       productivity.enddate.toLowerCase().includes(searchInLower) ||
       productivity.objectstatus.toLowerCase().includes(searchInLower);
-  
-    // Pastikan data cocok dengan filter dropdown dan pencarian
+
     return dropdownFiltersMatch && searchMatch;
   });
-  
-  
-  
 
-  // Hitung data yang ditampilkan pada halaman saat ini
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentData = filteredAndSearchedData.slice(
@@ -95,7 +91,6 @@ export const ProductivityTable: React.FC<ProductivityTableProps> = ({
     indexOfLastItem
   );
 
-  // Hitung total halaman
   const totalPages = Math.ceil(filteredAndSearchedData.length / itemsPerPage);
 
   const handlePageChange = (
@@ -190,10 +185,12 @@ export const ProductivityTable: React.FC<ProductivityTableProps> = ({
                 <TableCell>{productivity.objectid.trim()}</TableCell>
                 <TableCell>{productivity.objectgroup.trim()}</TableCell>
                 <TableCell>{productivity.objectcode.trim()}</TableCell>
-                <TableCell>{productivity.outputcapacity}</TableCell>
+                <TableCell>
+                  {parseFloat(productivity.outputcapacity).toString()}
+                </TableCell>
                 <TableCell>{productivity.outputuom.trim()}</TableCell>
                 <TableCell>{productivity.outputtime.trim()}</TableCell>
-                <TableCell>{productivity.outputcost}</TableCell>
+                <TableCell>{parseFloat(productivity.outputcost)}</TableCell>
                 <TableCell>{productivity.startdate}</TableCell>
                 <TableCell>{productivity.enddate}</TableCell>
                 <TableCell>{productivity.objectstatus.trim()}</TableCell>

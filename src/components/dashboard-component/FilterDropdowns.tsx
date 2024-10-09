@@ -116,11 +116,19 @@ export const FilterDropdowns: React.FC<FilterDropdownsProps> = ({
                 );
               }}
             >
-              {uniqueValues[field as keyof typeof uniqueValues].map((val) => (
-                <DropdownMenuRadioItem key={val} value={val}>
-                  {val}
-                </DropdownMenuRadioItem>
-              ))}
+              <DropdownMenuRadioItem
+                value={`All ${fieldLabels[field as keyof typeof uniqueValues]}`}
+              >
+                {`All ${fieldLabels[field as keyof typeof uniqueValues]}`}
+              </DropdownMenuRadioItem>
+
+              {uniqueValues[field as keyof typeof uniqueValues]
+                .filter((val) => !val.toLowerCase().includes("all"))
+                .map((val) => (
+                  <DropdownMenuRadioItem key={val} value={val}>
+                    {val}
+                  </DropdownMenuRadioItem>
+                ))}
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>
