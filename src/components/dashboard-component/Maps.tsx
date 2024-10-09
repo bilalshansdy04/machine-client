@@ -581,11 +581,11 @@ const starIcon = L.divIcon({
                                         className={`ml-2 text-sm ${textColor}`}
                                       >
                                         Output Capacity:{" "}
-                                        {outputCapacity.toFixed(2)}
+                                        {parseFloat(outputCapacity.toFixed(2))}
                                       </span>
                                     </div>
                                     <h2 className="font-bold text-black">
-                                      (Average: {average.toFixed(2)})
+                                      (Average: {parseFloat(average.toFixed(2))})
                                     </h2>
                                   </li>
                                 </ul>
