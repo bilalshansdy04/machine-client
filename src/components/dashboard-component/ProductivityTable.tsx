@@ -14,6 +14,7 @@ import { Input } from "../ui/input.tsx";
 import { Button } from "../ui/button.tsx";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { FilterDropdowns } from "./FilterDropdowns.tsx";
+import { exportTableToPDF  } from "../../utils/convertToPDF.ts";
 
 interface ProductivityTableProps {
   filteredData: MachineProductivity[];
@@ -36,6 +37,8 @@ export const ProductivityTable: React.FC<ProductivityTableProps> = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [confirmedSearchTerm, setConfirmedSearchTerm] = useState("");
   const itemsPerPage = 3;
+  const [startPage, setStartPage] = useState<number>(1);
+  const [endPage, setEndPage] = useState<number>(1);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
@@ -71,12 +74,12 @@ export const ProductivityTable: React.FC<ProductivityTableProps> = ({
       productivity.objectcode.toLowerCase().includes(searchInLower) ||
       parseFloat(productivity.outputcapacity.toString())
         .toString()
-        .includes(searchInLower) || // <-- Update di sini
+        .includes(searchInLower) ||
       productivity.outputuom.toLowerCase().includes(searchInLower) ||
       productivity.outputtime.toLowerCase().includes(searchInLower) ||
       parseFloat(productivity.outputcost.toString())
         .toString()
-        .includes(searchInLower) || // <-- Update di sini
+        .includes(searchInLower) ||
       productivity.startdate.toLowerCase().includes(searchInLower) ||
       productivity.enddate.toLowerCase().includes(searchInLower) ||
       productivity.objectstatus.toLowerCase().includes(searchInLower);
@@ -98,6 +101,22 @@ export const ProductivityTable: React.FC<ProductivityTableProps> = ({
     pageNumber: number
   ) => {
     setCurrentPage(pageNumber);
+  };
+
+  const handleExportPDF = () => {
+    // Pastikan `startPage` dan `endPage` berada dalam batas jumlah halaman yang tersedia
+    const validStartPage = Math.max(1, Math.min(startPage, totalPages));
+    const validEndPage = Math.max(
+      validStartPage,
+      Math.min(endPage, totalPages)
+    );
+
+    convertToPDF(
+      filteredAndSearchedData,
+      validStartPage,
+      validEndPage,
+      itemsPerPage
+    );
   };
 
   if (isLoading) {
@@ -142,12 +161,49 @@ export const ProductivityTable: React.FC<ProductivityTableProps> = ({
                 width="24"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <g stroke="#fff" stroke-linejoin="round" stroke-width="1.5">
-                  <path d="m17.5 17.5 4.5 4.5" stroke-linecap="round" />
+                <g stroke="#fff" strokeLinejoin="round" strokeWidth="1.5">
+                  <path d="m17.5 17.5 4.5 4.5" strokeLinecap="round" />
                   <path d="m20 11c0-4.97056-4.0294-9-9-9-4.97056 0-9 4.02944-9 9 0 4.9706 4.02944 9 9 9 4.9706 0 9-4.0294 9-9z" />
                 </g>
               </svg>
             </Button>
+          </div>
+          <div className="flex w-full max-w-sm items-center space-x-2 mb-3">
+            <div className="flex gap-1">
+              <Input
+                type="number"
+                min={1}
+                max={totalPages}
+                placeholder="Start Page"
+                value={startPage}
+                onChange={(e) => setStartPage(Number(e.target.value))}
+              />
+              <Input
+                type="number"
+                min={1}
+                max={totalPages}
+                placeholder="End Page"
+                value={endPage}
+                onChange={(e) => setEndPage(Number(e.target.value))}
+              />
+            </div>
+            <div className="flex justify-end">
+              <Button
+                type="button"
+                onClick={() =>
+                  exportTableToPDF(
+                    filteredAndSearchedData,
+                    startPage,
+                    endPage,
+                    itemsPerPage,
+                    "productivity"
+                  )
+                }
+                className="bg-oceanKnight text-white hover:bg-abyssKnight"
+              >
+                Export Productivity to PDF
+              </Button>
+            </div>
           </div>
         </div>
         <div>
@@ -190,7 +246,9 @@ export const ProductivityTable: React.FC<ProductivityTableProps> = ({
                 </TableCell>
                 <TableCell>{productivity.outputuom.trim()}</TableCell>
                 <TableCell>{productivity.outputtime.trim()}</TableCell>
-                <TableCell>{parseFloat(productivity.outputcost)}</TableCell>
+                <TableCell>
+                  {parseFloat(productivity.outputcost).toString()}
+                </TableCell>
                 <TableCell>{productivity.startdate}</TableCell>
                 <TableCell>{productivity.enddate}</TableCell>
                 <TableCell>{productivity.objectstatus.trim()}</TableCell>

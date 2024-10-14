@@ -18,7 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
-import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+// import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 export default function Chart({ data }: { data: any[] }) {
   const [selectedObjectCode, setSelectedObjectCode] = React.useState(""); // Default to empty string
@@ -159,15 +159,15 @@ export default function Chart({ data }: { data: any[] }) {
             </p>
           )
         ) : (
-          <div className="flex flex-col items-center justify-center">
-            <div className="">
+          <div className="flex flex-col items-center justify-center h-full">
+            {/* <div className="">
               <DotLottieReact
                 src="https://lottie.host/84f4e184-a82b-4fb9-9566-f2e7972c012b/q3pDfG6QNK.json"
                 backgroundColor="transparent"
                 loop
                 autoplay
               />
-            </div>
+            </div> */}
             <p>Choose Object Code To Display Chart</p>
           </div>
         )}

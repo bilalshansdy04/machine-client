@@ -13,6 +13,7 @@ import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { exportTableToPDF  } from "../../utils/convertToPDF.ts";
 
 export interface MachineRecord {
   objecttype: string;
@@ -32,13 +33,14 @@ const API_URL = import.meta.env.VITE_MACHINE_PRODUCTIVITY_URL;
 const IV = import.meta.env.VITE_IV;
 const API_KEY = import.meta.env.VITE_API_KEY;
 
-
 export default function RecordTable() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [confirmedSearchTerm, setConfirmedSearchTerm] = useState("");
   const [apiData, setApiData] = useState<MachineRecord[]>([]);
   const itemsPerPage = 3;
+  const [startPage, setStartPage] = useState<number>(1);
+  const [endPage, setEndPage] = useState<number>(1);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
@@ -186,6 +188,43 @@ export default function RecordTable() {
                   </g>
                 </svg>
               </Button>
+            </div>
+            <div className="flex w-full max-w-sm items-center space-x-2 mb-3">
+              <div className="flex gap-1">
+                <Input
+                  type="number"
+                  min={1}
+                  max={totalPages}
+                  placeholder="Start Page"
+                  value={startPage}
+                  onChange={(e) => setStartPage(Number(e.target.value))}
+                />
+                <Input
+                  type="number"
+                  min={1}
+                  max={totalPages}
+                  placeholder="End Page"
+                  value={endPage}
+                  onChange={(e) => setEndPage(Number(e.target.value))}
+                />
+              </div>
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  onClick={() =>
+                    exportTableToPDF(
+                      filteredAndSearchedData,
+                      startPage,
+                      endPage,
+                      itemsPerPage,
+                      "record"
+                    )
+                  }
+                  className="bg-oceanKnight text-white hover:bg-abyssKnight"
+                >
+                  Export Record to PDF
+                </Button>
+              </div>
             </div>
           </div>
           <Table>
