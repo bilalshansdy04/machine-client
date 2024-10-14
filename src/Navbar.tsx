@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+// import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -34,28 +34,28 @@ export default function Navbar() {
               <h1 className="text-4xl font-bold text-flamePhoenix drop-shadow-xl">
                 Dash<span className="text-oceanKnight">board</span>
               </h1>
-              <div className="w-24">
+              {/* <div className="w-24">
                 <DotLottieReact
                   src="https://lottie.host/b13a4b33-c45c-49a0-9eda-e5026e48418d/oRSXnTjKMV.json"
                   backgroundColor="transparent"
                   loop
                   autoplay
                 />
-              </div>
+              </div> */}
             </div>
           ) : (
             <a href="/" className="flex items-center">
               <h1 className="text-4xl font-bold text-flamePhoenix drop-shadow-xl">
                 Dash<span className="text-oceanKnight">board</span>
               </h1>
-              <div className="w-24">
+              {/* <div className="w-24">
                 <DotLottieReact
                   src="https://lottie.host/b13a4b33-c45c-49a0-9eda-e5026e48418d/oRSXnTjKMV.json"
                   backgroundColor="transparent"
                   loop
                   autoplay
                 />
-              </div>
+              </div> */}
             </a>
           )}
           {location.pathname !== "/guide" && (
