@@ -35,54 +35,70 @@ export const guideContent = `
   <h4>Maps</h4>
   <p>Peta ini menampilkan lokasi mesin atau area yang dikelola.</p>
 
-  <h3>1.3 Filter dan Sortir Data</h3>
+  <h2>2. Penjelasan Warna Marker di Peta</h2>
   <p>
-    Beberapa komponen (seperti tabel) mendukung fitur filter dan sortir:
+    Peta pada dashboard ini dilengkapi dengan marker warna-warni yang menunjukkan status output capacity setiap mesin atau area. Berikut adalah penjelasan mengenai warna-warna marker:
   </p>
-  <ul>
-    <li><strong>Filter:</strong> Kamu bisa memfilter data berdasarkan periode waktu, jenis mesin, atau kriteria lainnya.</li>
-    <li><strong>Sortir:</strong> Klik pada header kolom di tabel untuk mengurutkan data secara naik atau turun.</li>
-  </ul>
 
-  <div class="mt-5">
-    <h3 class="text-2xl font-bold mb-2">Penjelasan Warna Marker di Peta</h3>
-    
-    <div class="flex items-center mb-4">
-      <div class="w-8 h-8 flex justify-center items-center text-3xl">
-        <i class="fas fa-map-marker-alt" style="color: #063599; font-size: 32px;"></i>
-      </div>
-      <p class="ml-4 text-base">Marker Biru: Output capacity di atas rata-rata.</p>
+  <div class="flex items-center mb-4">
+    <div class="w-8 h-8 flex justify-center items-center text-3xl">
+      <i class="fas fa-map-marker-alt" style="color: #063599; font-size: 32px;"></i>
     </div>
-
-    <div class="flex items-center mb-4">
-      <div class="w-8 h-8 flex justify-center items-center text-3xl">
-        <i class="fas fa-map-marker-alt" style="color: #910d06; font-size: 32px;"></i>
-      </div>
-      <p class="ml-4 text-base">Marker Merah: Output capacity di bawah rata-rata.</p>
-    </div>
-
-    <div class="flex items-center">
-      <div class="relative w-8 h-8 flex justify-center items-center">
-        <i class="fas fa-map-marker-alt" style="color: #063599; font-size: 32px;"></i>
-        <i class="fas fa-star absolute" style="color: #FFD700; font-size: 16px; top: -10px; left: 10px;"></i>
-      </div>
-      <p class="ml-4 text-base">Marker dengan Bintang: Output capacity paling tinggi.</p>
-    </div>
+    <p class="ml-4 text-base">Marker Biru: Output capacity di atas rata-rata.</p>
   </div>
 
-  <h2>2. FAQ (Frequently Asked Questions)</h2>
+  <div class="flex items-center mb-4">
+    <div class="w-8 h-8 flex justify-center items-center text-3xl">
+      <i class="fas fa-map-marker-alt" style="color: #910d06; font-size: 32px;"></i>
+    </div>
+    <p class="ml-4 text-base">Marker Merah: Output capacity di bawah rata-rata.</p>
+  </div>
 
-  <h3>2.1 Apakah saya perlu login untuk mengakses dashboard ini?</h3>
+  <div class="flex items-center">
+    <div class="relative w-8 h-8 flex justify-center items-center">
+      <i class="fas fa-map-marker-alt" style="color: #063599; font-size: 32px;"></i>
+      <i class="fas fa-star absolute" style="color: #FFD700; font-size: 16px; top: -10px; left: 10px;"></i>
+    </div>
+    <p class="ml-4 text-base">Marker dengan Bintang: Output capacity paling tinggi.</p>
+  </div>
+
+  <h2>3. Export Data ke PDF</h2>
+  <p>
+    Di dashboard ini, terdapat fitur untuk mengekspor data produktivitas dan catatan (records) ke dalam bentuk PDF. Fitur ini memudahkan pengguna untuk menyimpan laporan atau data dalam format yang dapat dibagikan atau diarsipkan.
+  </p>
+
+  <h3>3.1 Cara Menggunakan Fitur Export ke PDF</h3>
+  <ol>
+    <li><strong>Filter Data (Opsional):</strong> Sebelum mengekspor data, Anda dapat memfilter atau mencari data yang relevan menggunakan fitur pencarian dan dropdown filter.</li>
+    <li><strong>Pilih Halaman yang Ingin Diekspor:</strong> Di bagian atas tabel, Anda bisa memilih halaman awal <em>(Start Page)</em> dan halaman akhir <em>(End Page)</em> yang ingin diekspor. Jika Anda ingin mengekspor seluruh data yang terlihat, tentukan halaman awal sebagai 1 dan halaman akhir sesuai jumlah halaman yang tersedia.</li>
+    <li><strong>Klik Tombol Export:</strong> Setelah menentukan halaman, klik tombol <strong>Export Productivity to PDF</strong> untuk mengekspor data produktivitas, atau tombol <strong>Export Record to PDF</strong> untuk mengekspor catatan data. File PDF akan otomatis diunduh ke perangkat Anda.</li>
+  </ol>
+
+  <h3>3.2 Contoh Kasus Penggunaan</h3>
+  <ul>
+    <li><strong>Export Data Produktivitas:</strong> Jika Anda ingin mengekspor data produktivitas dari mesin-mesin yang telah difilter dan ditampilkan di tabel, masukkan halaman yang ingin diekspor, lalu klik tombol <strong>Export Productivity to PDF</strong>.</li>
+    <li><strong>Export Record:</strong> Jika Anda ingin mengekspor riwayat penggunaan mesin, pilih tab <em>Records</em> dan gunakan fitur ekspor untuk mengekspor data tersebut ke PDF.</li>
+  </ul>
+
+  <h3>3.3 Tips</h3>
+  <ul>
+    <li>Jika Anda hanya ingin mengekspor sebagian data, gunakan fitur filter terlebih dahulu agar data yang diekspor lebih relevan dan terfokus.</li>
+    <li>Pastikan koneksi internet stabil agar proses ekspor berjalan lancar.</li>
+  </ul>
+
+  <h2>4. FAQ (Frequently Asked Questions)</h2>
+
+  <h3>4.1 Apakah saya perlu login untuk mengakses dashboard ini?</h3>
   <p>
     Saat ini, dashboard ini bersifat publik, sehingga siapa saja dapat mengaksesnya tanpa login.
   </p>
 
-  <h3>2.2 Data apa saja yang ditampilkan di dashboard ini?</h3>
+  <h3>4.2 Data apa saja yang ditampilkan di dashboard ini?</h3>
   <p>
     Dashboard ini menampilkan data terkait performa mesin, produktivitas, dan riwayat penggunaan.
   </p>
 
-  <h3>2.3 Apa yang harus dilakukan jika data tidak muncul?</h3>
+  <h3>4.3 Apa yang harus dilakukan jika data tidak muncul?</h3>
   <ul>
     <li>Coba refresh halaman dengan menekan Ctrl + R (Windows) atau Cmd + R (Mac).</li>
     <li>Pastikan koneksi internet kamu stabil.</li>
