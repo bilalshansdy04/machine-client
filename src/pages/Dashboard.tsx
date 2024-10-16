@@ -37,17 +37,14 @@ const fieldLabels: { [key in keyof MachineProductivity]: string } = {
   startdate: "Dates",
 };
 
-
 export default function Dashboard() {
   const [selectedFilters, setSelectedFilters] = useState<
     Partial<Record<keyof MachineProductivity, string>>
   >({});
   const [apiData, setApiData] = useState<MachineProductivity[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
-    setIsLoading(true);
-
     const jsonData = {
       datacore: "MACHINE",
       folder: "MACHINEPRODUCTIVITY",
@@ -100,7 +97,7 @@ export default function Dashboard() {
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
@@ -123,7 +120,7 @@ export default function Dashboard() {
       outputcapacity: ["All Capacities", ...sortedOutputCapacity],
       startdate: ["All Dates", ...getUniqueValues(apiData, "startdate")],
     };
-  }, [apiData]);
+  }, [{ apiData, loading }]);
 
   return (
     <div className="flex flex-col gap-10">
@@ -196,7 +193,7 @@ const getUniqueValues = (
   const values = data.map((item) => {
     if (field === "outputcapacity") return item.outputcapacity || "0";
     if (field === "startdate") return item.startdate || "";
-    return item[field]?.toString() || ""; 
+    return item[field]?.toString() || "";
   });
 
   return Array.from(new Set(values)).filter((val) => val !== "");

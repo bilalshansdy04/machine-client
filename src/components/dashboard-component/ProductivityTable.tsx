@@ -14,7 +14,7 @@ import { Input } from "../ui/input.tsx";
 import { Button } from "../ui/button.tsx";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { FilterDropdowns } from "./FilterDropdowns.tsx";
-import { exportTableToPDF  } from "../../utils/convertToPDF.ts";
+import { exportTableToPDF } from "../../utils/convertToPDF.ts";
 
 interface ProductivityTableProps {
   filteredData: MachineProductivity[];
@@ -22,7 +22,7 @@ interface ProductivityTableProps {
   selectedFilters: any;
   fieldLabels: any;
   handleFilterChange: (field: keyof MachineProductivity, value: string) => void;
-  isLoading: boolean;
+  loading: boolean;
 }
 
 export const ProductivityTable: React.FC<ProductivityTableProps> = ({
@@ -31,14 +31,19 @@ export const ProductivityTable: React.FC<ProductivityTableProps> = ({
   selectedFilters,
   fieldLabels,
   handleFilterChange,
-  isLoading,
+  loading,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [confirmedSearchTerm, setConfirmedSearchTerm] = useState("");
   const itemsPerPage = 3;
-  const [startPage, setStartPage] = useState<number>(1);
-  const [endPage, setEndPage] = useState<number>(1);
+  const [isFocusedStartPage, setIsFocusedStartPage] = useState(false);
+  const [isFocusedEndPage, setIsFocusedEndPage] = useState(false);
+  const [startPage, setStartPage] = useState<number | "">("");
+  const [endPage, setEndPage] = useState<number | "">("");
+  const [isEndPageValid, setIsEndPageValid] = useState(true);
+  const [isStartPageValid, setIsStartPageValid] = useState(true);
+
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
@@ -47,6 +52,20 @@ export const ProductivityTable: React.FC<ProductivityTableProps> = ({
   const handleSearchSubmit = () => {
     setConfirmedSearchTerm(searchTerm);
     setCurrentPage(1);
+  };
+
+  const handleInputValidation = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    setter: React.Dispatch<React.SetStateAction<number | "">>,
+    setIsValid: React.Dispatch<React.SetStateAction<boolean>>
+  ) => {
+    const value = e.target.value;
+    if (/^\d*$/.test(value)) {
+      setter(value === "" ? "" : Number(value));
+      setIsValid(true);
+    } else {
+      setIsValid(false);
+    }
   };
 
   const filteredAndSearchedData = filteredData.filter((productivity) => {
@@ -119,18 +138,6 @@ export const ProductivityTable: React.FC<ProductivityTableProps> = ({
     );
   };
 
-  if (isLoading) {
-    return (
-      <div>
-        <DotLottieReact
-          src="https://lottie.host/84f4e184-a82b-4fb9-9566-f2e7972c012b/q3pDfG6QNK.json"
-          backgroundColor="transparent"
-          loop
-          autoplay
-        />
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col min-h-[29rem] justify-between">
@@ -169,23 +176,55 @@ export const ProductivityTable: React.FC<ProductivityTableProps> = ({
             </Button>
           </div>
           <div className="flex w-full max-w-sm items-center space-x-2 mb-3">
-            <div className="flex gap-1">
-              <Input
-                type="number"
-                min={1}
-                max={totalPages}
-                placeholder="Start Page"
-                value={startPage}
-                onChange={(e) => setStartPage(Number(e.target.value))}
-              />
-              <Input
-                type="number"
-                min={1}
-                max={totalPages}
-                placeholder="End Page"
-                value={endPage}
-                onChange={(e) => setEndPage(Number(e.target.value))}
-              />
+            <div className="flex gap-3">
+              <div className="relative">
+                <Input
+                  type="text"
+                  placeholder="Start Page"
+                  value={startPage}
+                  onFocus={() => setIsFocusedStartPage(true)}
+                  onBlur={() => setIsFocusedStartPage(false)}
+                  onChange={(e) =>
+                    handleInputValidation(e, setStartPage, setIsStartPageValid)
+                  }
+                  className={`${
+                    !isStartPageValid
+                      ? isFocusedStartPage
+                        ? "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-red-500 focus-visible:border-red-500"
+                        : "outline outline-2 outline-red-500"
+                      : ""
+                  }`}
+                />
+                {!isStartPageValid && (
+                  <p className="text-red-500 text-xs absolute -bottom-4 left-0">
+                    Number only
+                  </p>
+                )}
+              </div>
+              <div className="relative">
+                <Input
+                  type="text"
+                  placeholder="End Page"
+                  value={endPage}
+                  onFocus={() => setIsFocusedEndPage(true)}
+                  onBlur={() => setIsFocusedEndPage(false)}
+                  onChange={(e) =>
+                    handleInputValidation(e, setEndPage, setIsEndPageValid)
+                  }
+                  className={`${
+                    !isEndPageValid
+                      ? isFocusedEndPage
+                        ? "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-red-500 focus-visible:border-red-500"
+                        : "outline outline-2 outline-red-500"
+                      : ""
+                  }`}
+                />
+                {!isEndPageValid && (
+                  <p className="text-red-500 text-xs absolute -bottom-4 left-0">
+                    Number only
+                  </p>
+                )}
+              </div>
             </div>
             <div className="flex justify-end">
               <Button
@@ -201,7 +240,7 @@ export const ProductivityTable: React.FC<ProductivityTableProps> = ({
                 }
                 className="bg-oceanKnight text-white hover:bg-abyssKnight"
               >
-                Export Productivity to PDF
+                Export to PDF
               </Button>
             </div>
           </div>

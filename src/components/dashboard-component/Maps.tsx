@@ -245,10 +245,10 @@ export default function Maps() {
   };
 
   const findTopOutputCapacityMachines = () => {
-    console.log("Function called");
+    // console.log("Function called");
 
     if (productivityData.length === 0) {
-      console.log("No data available");
+      // console.log("No data available");
       return [];
     }
 
@@ -266,26 +266,26 @@ export default function Maps() {
       }
     });
 
-    console.log("Latest Capacities by Object ID:", latestCapacities);
+    // console.log("Latest Capacities by Object ID:", latestCapacities);
 
     const maxCapacity = Math.max(...Object.values(latestCapacities));
-    console.log("Max Capacity:", maxCapacity);
+    // console.log("Max Capacity:", maxCapacity);
 
     const topMachines = productivityData.filter((machine) => {
       const objectId = machine.objectid;
       return latestCapacities[objectId] === maxCapacity;
     });
 
-    console.log("Top Machines:", topMachines);
+    // console.log("Top Machines:", topMachines);
 
-    if (topMachines.length === 0) {
-      console.log("No machines found with max capacity");
-    } else {
-      console.log("Machines with Max Capacity:", topMachines);
-      topMachines.forEach((machine) => {
-        console.log("Object ID of Top Capacity Machine:", machine.objectid);
-      });
-    }
+    // if (topMachines.length === 0) {
+    //   console.log("No machines found with max capacity");
+    // } else {
+    //   console.log("Machines with Max Capacity:", topMachines);
+    //   topMachines.forEach((machine) => {
+    //     console.log("Object ID of Top Capacity Machine:", machine.objectid);
+    //   });
+    // }
 
     return topMachines;
   };
@@ -319,12 +319,12 @@ export default function Maps() {
   const topOutputCapacity = Math.max(
     ...productivityData.map((data) => parseFloat(data.outputcapacity) || 0)
   );
-  console.log("Top Output Capacity:", topOutputCapacity);
+  // console.log("Top Output Capacity:", topOutputCapacity);
 
   const topMachines = productivityData.filter(
     (machine) => parseFloat(machine.outputcapacity) === topOutputCapacity
   );
-  console.log("Top Machines:", topMachines);
+  // console.log("Top Machines:", topMachines);
 
   const blueIcon = L.divIcon({
     className: "custom-icon",
@@ -392,9 +392,9 @@ const starIcon = L.divIcon({
               const isTopMachine = topOutputMachine.some(
                 (topMachine) => topMachine.objectid === machine.objectid
               );
-              console.log(
-                `Machine ${machine.objectname} is top machine: ${isTopMachine}`
-              );
+              // console.log(
+              //   `Machine ${machine.objectname} is top machine: ${isTopMachine}`
+              // );
               const textColor =
                 outputCapacity > average ? "text-blue-600" : "text-red-600";
               const icon = isTopMachine
