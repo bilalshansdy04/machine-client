@@ -52,7 +52,10 @@ export const FilterDropdowns: React.FC<FilterDropdownsProps> = ({
       {Object.keys(uniqueValues).map((field) => (
         <DropdownMenu key={field}>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="bg-flamePhoenix outline-flamePhoenix text-white hover:bg-emberPhoenix hover:text-white">
+            <Button
+              variant="outline"
+              className="bg-flamePhoenix outline-flamePhoenix text-white hover:bg-emberPhoenix hover:text-white"
+            >
               Filter by{" "}
               {
                 fieldLabels[
@@ -98,7 +101,8 @@ export const FilterDropdowns: React.FC<FilterDropdownsProps> = ({
                   >
                 ] || ""
               }
-              onValueChange={(value) =>
+              onValueChange={(value) => {
+                console.log(`Filter ${field} berubah menjadi: ${value}`);
                 handleFilterChange(
                   field as keyof Omit<
                     MachineProductivity,
@@ -109,14 +113,20 @@ export const FilterDropdowns: React.FC<FilterDropdownsProps> = ({
                     | "objectstatus"
                   >,
                   value
-                )
-              }
+                );
+              }}
             >
-              {uniqueValues[field as keyof typeof uniqueValues].map((val) => (
-                <DropdownMenuRadioItem key={val} value={val}>
-                  {val}
-                </DropdownMenuRadioItem>
-              ))}
+              <DropdownMenuRadioItem value="">
+                {`All ${fieldLabels[field as keyof typeof fieldLabels]}`}
+              </DropdownMenuRadioItem>
+
+              {uniqueValues[field as keyof typeof uniqueValues]
+                .filter((val) => !val.toLowerCase().includes("all")) // Pastikan tidak ada "All" di sini
+                .map((val) => (
+                  <DropdownMenuRadioItem key={val} value={val}>
+                    {val}
+                  </DropdownMenuRadioItem>
+                ))}
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -124,4 +134,3 @@ export const FilterDropdowns: React.FC<FilterDropdownsProps> = ({
     </div>
   );
 };
-
