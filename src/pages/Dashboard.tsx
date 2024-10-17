@@ -2,8 +2,6 @@ import Chart from "@/components/dashboard-component/Chart";
 import Maps from "@/components/dashboard-component/Maps";
 import ProductivityTable from "@/components/dashboard-component/ProductivityTable";
 import RecordTable from "@/components/dashboard-component/RecordTable";
-import { Question } from "@phosphor-icons/react";
-import { Link } from "react-router-dom";
 
 export default function Dashboard() {
   return (
