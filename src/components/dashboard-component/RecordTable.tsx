@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import axios from "axios";
-import { encryptMessage, decryptMessage } from "../../utils/aes256.ts";
+
 import {
   Table,
   TableBody,
@@ -11,84 +10,37 @@ import {
 } from "@/components/ui/table";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
+
 import { grid } from "ldrs";
+
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { exportTableToPDF } from "../../utils/convertToPDF.ts";
 
-export interface MachineRecord {
-  objecttype: string;
-  objectgroup: string;
-  objectid: string;
-  objectcode: string;
-  recorddate: string;
-  recordtaskid: string;
-  recordno: string;
-  recordby: string;
-  recorddescription: string;
-  recordnotes: string;
-  recordstatus: string;
-}
+import { exportTableToPDF } from "../../utils/convertToPDF.ts";
+import { RecordFetchData } from "@/utils/fetchData/record-fetch-data.ts";
+import { MachineRecord } from "../../utils/interface/interface.ts";
 
 grid.register();
 
-const API_URL = import.meta.env.VITE_MACHINE_PRODUCTIVITY_URL;
-const IV = import.meta.env.VITE_IV;
-const API_KEY = import.meta.env.VITE_API_KEY;
 
 const useFetchData = (currentPage: number) => {
   const [apiData, setApiData] = useState<MachineRecord[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchData = useCallback(async () => {
-    const jsonData = {
-      datacore: "MACHINE",
-      folder: "MACHINERECORDS",
-      command: "SELECT",
-      group: "XCYTUA",
-      property: "PJLBBS",
-      fields:
-        "objecttype,objectgroup,objectid,objectcode,recorddate,recordtaskid,recordno,recordby,recorddescription,recordnotes,recordstatus",
-      pageno: 0,
-      recordperpage: 20,
-      condition: {
-        objectid: { operator: "LIKE", value: "%" },
-      },
-    };
-
-    const encryptedMessage = encryptMessage(JSON.stringify(jsonData));
-
-    const payload = {
-      apikey: API_KEY,
-      uniqueid: IV,
-      timestamp: new Date().toISOString().replace(/[-:.TZ]/g, ""),
-      localdb: "N",
-      message: encryptedMessage,
-    };
-
-    try {
-      const response = await axios.post(API_URL, payload, {
-        headers: { "Content-Type": "application/json" },
-      });
-      if (response.data.code == 200) {
-        const decryptedData = decryptMessage(response.data.message);
-        const parsedData = JSON.parse(decryptedData);
-        if (Array.isArray(parsedData.data)) {
-          setApiData(parsedData.data);
-          console.log("Data fetched:", parsedData.data);
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false); // Memastikan loading menjadi false setelah selesai fetch data
-      console.log("Loading set to false");
-    }
-  }, [currentPage]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    const fetchAndSetData = async () => {
+      setLoading(true);
+      const data = await RecordFetchData();
+      if (data) {
+        setApiData(data);
+      }
+      setLoading(false);
+    };
+  
+    fetchAndSetData();
+  }, [currentPage]);
+  
 
   return { apiData, loading };
 };

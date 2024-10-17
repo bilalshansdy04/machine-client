@@ -3,14 +3,14 @@ import {
   machineIdMessage,
   machineProductivityMessage,
   machineProfileMessage,
-} from "../message/maps-message.ts";
+} from "../message/message.ts";
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_MACHINE_PRODUCTIVITY_URL;
 const IV = import.meta.env.VITE_IV;
 const API_KEY = import.meta.env.VITE_API_KEY;
 
-export const fetchData = async () => {
+export const MapsFetchData = async () => {
   const formattedJsonStringId = JSON.stringify(machineIdMessage, null, 2);
   const formattedJsonStringProductivity = JSON.stringify(
     machineProductivityMessage,
