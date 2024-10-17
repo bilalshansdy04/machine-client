@@ -36,3 +36,17 @@ export interface MachineId {
     enddate: string;
     objectstatus: string;
   }
+
+  export interface MachineRecord {
+    objecttype: string;
+    objectgroup: string;
+    objectid: string;
+    objectcode: string;
+    recorddate: string;
+    recordtaskid: string;
+    recordno: string;
+    recordby: string;
+    recorddescription: string;
+    recordnotes: string;
+    recordstatus: string;
+  }

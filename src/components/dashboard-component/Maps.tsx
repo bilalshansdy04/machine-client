@@ -8,7 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { fetchData } from "../../utils/fetchData/maps-fetchData.ts";
+import { MapsFetchData } from "../../utils/fetchData/maps-fetch-data.ts";
 import { blueIcon, redIcon, starIcon } from "../map-ui/MapIcons.ts";
 import "leaflet/dist/leaflet.css";
 
@@ -20,7 +20,7 @@ export default function Maps() {
 
   useEffect(() => {
     const fetchAndSetData = async () => {
-      const data = await fetchData();
+      const data = await MapsFetchData();
       if (data) {
         setApiData(data.apiData);
         setProductivityData(data.productivityData);
@@ -75,17 +75,6 @@ export default function Maps() {
       const objectId = machine.objectid;
       return latestCapacities[objectId] === maxCapacity;
     });
-
-    // console.log("Top Machines:", topMachines);
-
-    // if (topMachines.length === 0) {
-    //   console.log("No machines found with max capacity");
-    // } else {
-    //   console.log("Machines with Max Capacity:", topMachines);
-    //   topMachines.forEach((machine) => {
-    //     console.log("Object ID of Top Capacity Machine:", machine.objectid);
-    //   });
-    // }
 
     return topMachines;
   };
@@ -358,7 +347,8 @@ export default function Maps() {
                                       </span>
                                     </div>
                                     <h2 className="font-bold text-black">
-                                      (Average: {parseFloat(average.toFixed(2))})
+                                      (Average: {parseFloat(average.toFixed(2))}
+                                      )
                                     </h2>
                                   </li>
                                 </ul>

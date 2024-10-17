@@ -7,36 +7,22 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
+
 import { Input } from "../ui/input.tsx";
 import { Button } from "../ui/button.tsx";
-import { FilterDropdowns } from "./FilterDropdowns.tsx";
-import { exportTableToPDF } from "../../utils/convertToPDF.ts";
-import axios from "axios";
-import { grid } from "ldrs";
-import { encryptMessage, decryptMessage } from "@/utils/aes256";
 
-export interface MachineProductivity {
-  objectid: string;
-  id: number;
-  objecttype_id: number;
-  objectgroup_id: number;
-  objectcode_id: number;
-  outputcapacity: string;
-  outputuom: string;
-  outputtime: string;
-  outputcost: string;
-  startdate: string;
-  enddate: string;
-  objectstatus: string;
-}
+import { grid } from "ldrs";
+
+import { FilterDropdowns } from "./FilterDropdowns.tsx";
+
+import { MachineProductivity } from "../../utils/interface/interface.ts";
+import { exportTableToPDF } from "../../utils/convertToPDF.ts";
+import { ProductivityFetchData } from "../../utils/fetchData/productivity-fetch-data.ts";
 
 grid.register();
-
-const API_URL = import.meta.env.VITE_MACHINE_PRODUCTIVITY_URL;
-const IV = import.meta.env.VITE_IV;
-const API_KEY = import.meta.env.VITE_API_KEY;
 
 const fieldLabels = {
   objecttype: "Object Types",
@@ -74,57 +60,17 @@ export default function ProductivityTable() {
     }));
   };
 
-  const fetchData = async () => {
-    const jsonData = {
-      datacore: "MACHINE",
-      folder: "MACHINEPRODUCTIVITY",
-      command: "SELECT",
-      group: "XCYTUA",
-      property: "PJLBBS",
-      fields:
-        "objecttype,objectgroup,objectid,objectcode,outputcapacity,outputuom,outputtime,outputcost,startdate,enddate,objectstatus",
-      pageno: "0",
-      recordperpage: "100",
-      condition: {
-        objecttype: {
-          operator: "like",
-          value: "%",
-        },
-      },
-    };
-
-    const encryptedMessage = encryptMessage(JSON.stringify(jsonData));
-    const payload = {
-      apikey: API_KEY,
-      uniqueid: IV,
-      timestamp: new Date().toISOString().replace(/[-:.TZ]/g, ""),
-      localdb: "N",
-      message: encryptedMessage,
-    };
-
-    try {
-      const response = await axios.post(API_URL, payload, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.data.code == 200) {
-        const decryptedData = decryptMessage(response.data.message);
-        const parsedData = JSON.parse(decryptedData);
-        if (Array.isArray(parsedData.data)) {
-          setApiData(parsedData.data);
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchData();
+    const fetchAndSetData = async () => {
+      setLoading(true);
+      const data = await ProductivityFetchData();
+      if (data) {
+        setApiData(data);
+      }
+      setLoading(false);
+    };
+
+    fetchAndSetData();
   }, []);
 
   const uniqueValues = useMemo(() => {
@@ -187,6 +133,20 @@ export default function ProductivityTable() {
   );
   const totalPages = Math.ceil(filteredAndSearchedData.length / itemsPerPage);
 
+  const handleInputValidation = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    setter: React.Dispatch<React.SetStateAction<number | "">>,
+    setIsValid: React.Dispatch<React.SetStateAction<boolean>>
+  ) => {
+    const value = e.target.value;
+    if (/^\d*$/.test(value)) {
+      setter(value === "" ? "" : Number(value));
+      setIsValid(true);
+    } else {
+      setIsValid(false);
+    }
+  };
+
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
     pageNumber: number
@@ -220,7 +180,102 @@ export default function ProductivityTable() {
                   Overview of Machine Productivity
                 </h2>
               </div>
-              {/* Input and Button Elements */}
+              <div className="flex w-full max-w-sm items-center space-x-2 mb-3">
+                <Input
+                  type="text"
+                  placeholder="Search"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                />
+                <Button
+                  type="button"
+                  onClick={handleSearchSubmit}
+                  className="bg-oceanKnight text-white hover:bg-abyssKnight"
+                >
+                  <svg
+                    fill="none"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    width="24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <g stroke="#fff" strokeLinejoin="round" strokeWidth="1.5">
+                      <path d="m17.5 17.5 4.5 4.5" strokeLinecap="round" />
+                      <path d="m20 11c0-4.97056-4.0294-9-9-9-4.97056 0-9 4.02944-9 9 0 4.9706 4.02944 9 9 9 4.9706 0 9-4.0294 9-9z" />
+                    </g>
+                  </svg>
+                </Button>
+              </div>
+              <div className="flex w-full max-w-sm items-center space-x-2 mb-3 pl-5">
+                <div className="flex gap-3">
+                  <div className="relative">
+                    <Input
+                      type="text"
+                      placeholder="Start Page"
+                      value={startPage}
+                      onFocus={() => setIsFocusedStartPage(true)}
+                      onBlur={() => setIsFocusedStartPage(false)}
+                      onChange={(e) =>
+                        handleInputValidation(
+                          e,
+                          setStartPage,
+                          setIsStartPageValid
+                        )
+                      }
+                      className={`${
+                        !isStartPageValid
+                          ? isFocusedStartPage
+                            ? "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-red-500 focus-visible:border-red-500"
+                            : "outline outline-2 outline-red-500"
+                          : ""
+                      }`}
+                    />
+                    {!isStartPageValid && (
+                      <p className="text-red-500 text-xs absolute -bottom-4 left-0">
+                        Number only
+                      </p>
+                    )}
+                  </div>
+                  <div className="relative">
+                    <Input
+                      type="text"
+                      placeholder="End Page"
+                      value={endPage}
+                      onFocus={() => setIsFocusedEndPage(true)}
+                      onBlur={() => setIsFocusedEndPage(false)}
+                      onChange={(e) =>
+                        handleInputValidation(e, setEndPage, setIsEndPageValid)
+                      }
+                      className={`${
+                        !isEndPageValid
+                          ? isFocusedEndPage
+                            ? "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-red-500 focus-visible:border-red-500"
+                            : "outline outline-2 outline-red-500"
+                          : ""
+                      }`}
+                    />
+                    {!isEndPageValid && (
+                      <p className="text-red-500 text-xs absolute -bottom-4 left-0">
+                        Number only
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <Button
+                  onClick={() =>
+                    exportTableToPDF(
+                      filteredAndSearchedData,
+                      startPage,
+                      endPage,
+                      itemsPerPage,
+                      "productivity"
+                    )
+                  }
+                  className="bg-oceanKnight text-white hover:bg-abyssKnight"
+                >
+                  Export to PDF
+                </Button>
+              </div>
             </div>
             <div>
               <FilterDropdowns
@@ -253,21 +308,21 @@ export default function ProductivityTable() {
                     <TableCell className="font-black">
                       {indexOfFirstItem + index + 1}
                     </TableCell>
-                    <TableCell>{productivity.objecttype?.trim()}</TableCell>
-                    <TableCell>{productivity.objectid?.trim()}</TableCell>
-                    <TableCell>{productivity.objectgroup?.trim()}</TableCell>
-                    <TableCell>{productivity.objectcode?.trim()}</TableCell>
+                    <TableCell>{productivity.objecttype.trim()}</TableCell>
+                    <TableCell>{productivity.objectid.trim()}</TableCell>
+                    <TableCell>{productivity.objectgroup.trim()}</TableCell>
+                    <TableCell>{productivity.objectcode.trim()}</TableCell>
                     <TableCell>
                       {parseFloat(productivity.outputcapacity).toString()}
                     </TableCell>
-                    <TableCell>{productivity.outputuom?.trim()}</TableCell>
-                    <TableCell>{productivity.outputtime?.trim()}</TableCell>
+                    <TableCell>{productivity.outputuom.trim()}</TableCell>
+                    <TableCell>{productivity.outputtime.trim()}</TableCell>
                     <TableCell>
                       {parseFloat(productivity.outputcost).toString()}
                     </TableCell>
                     <TableCell>{productivity.startdate}</TableCell>
                     <TableCell>{productivity.enddate}</TableCell>
-                    <TableCell>{productivity.objectstatus?.trim()}</TableCell>
+                    <TableCell>{productivity.objectstatus.trim()}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
