@@ -71,6 +71,10 @@ export default function ProductivityTable() {
     };
 
     fetchAndSetData();
+
+    const interval = setInterval(fetchAndSetData, 10000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const uniqueValues = useMemo(() => {
