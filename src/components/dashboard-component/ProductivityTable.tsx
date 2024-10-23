@@ -21,6 +21,11 @@ import { FilterDropdowns } from "./FilterDropdowns.tsx";
 import { MachineProductivity } from "../../utils/interface/interface.ts";
 import { exportTableToPDF } from "../../utils/convertToPDF.ts";
 import { ProductivityFetchData } from "../../utils/fetchData/productivity-fetch-data.ts";
+import { Question } from "@phosphor-icons/react";
+
+import Shepherd from "shepherd.js";
+import "shepherd.js/dist/css/shepherd.css";
+import "../../style/shepherd-theme-custom.css";
 
 grid.register();
 
@@ -164,6 +169,180 @@ export default function ProductivityTable() {
     );
   };
 
+  const startTour = () => {
+    // Hentikan atau selesaikan tour jika sudah berjalan
+    if (Shepherd.activeTour) {
+      Shepherd.activeTour.complete();
+    }
+  
+    const tour: Shepherd.Tour = new Shepherd.Tour({
+      useModalOverlay: true,
+      defaultStepOptions: {
+        scrollTo: true,
+        cancelIcon: {
+          enabled: true,
+        },
+        buttons: [
+          {
+            text: 'Back',
+            action: () => tour.back(),
+            classes: 'default-button px-4 py-2 rounded',
+          },
+          {
+            text: 'Close',
+            action: () => tour.cancel(),
+            classes: 'default-button px-4 py-2 rounded',
+          },
+        ],
+      },
+    });
+  
+    tour.addStep({
+      id: 'title',
+      title: 'Table Title',
+      text: 'This is the title for the table.',
+      attachTo: { element: '#title-productivity', on: 'bottom' },
+      scrollTo: false,
+      classes: "mt-10",
+      buttons: [
+        {
+          text: 'Next',
+          action: tour.next,
+          classes: 'default-button px-4 py-2 rounded',
+        },
+      ],
+    });
+  
+    tour.addStep({
+      id: 'sub-title',
+      title: 'Table Overview',
+      text: 'This subtitle indicates that this table contains machine productivity data.',
+      attachTo: { element: '#sub-title', on: 'bottom' },
+      scrollTo: false,
+      classes: "mt-10",
+      buttons: [
+        {
+          text: "Back",
+          action: tour.back,
+          classes: "default-button",
+        },
+        {
+          text: 'Next',
+          action: tour.next,
+          classes: 'default-button px-4 py-2 rounded',
+        },
+      ],
+    });
+  
+    tour.addStep({
+      id: 'search',
+      title: 'Search',
+      text: `Use this search box to quickly find the data you're looking for.`,
+      attachTo: { element: '#search', on: 'bottom' },
+      scrollTo: false,
+      classes: "mt-10",
+      buttons: [
+        {
+          text: "Back",
+          action: tour.back,
+          classes: "default-button",
+        },
+        {
+          text: 'Next',
+          action: tour.next,
+          classes: 'default-button px-4 py-2 rounded',
+        },
+      ],
+    });
+  
+    tour.addStep({
+      id: 'export',
+      title: 'Export Data',
+      text: 'Use this feature to export data to PDF. Select specific pages from the table to export.',
+      attachTo: { element: '#export', on: 'bottom' },
+      scrollTo: false,
+      classes: "mt-10",
+      buttons: [
+        {
+          text: "Back",
+          action: tour.back,
+          classes: "default-button",
+        },
+        {
+          text: 'Next',
+          action: tour.next,
+          classes: 'default-button px-4 py-2 rounded',
+        },
+      ],
+    });
+  
+    tour.addStep({
+      id: 'filter-button',
+      title: 'Filter Button',
+      text: 'This button is used to filter the displayed data according to your selected criteria.',
+      attachTo: { element: '#filter-button', on: 'bottom' },
+      scrollTo: false,
+      classes: "mt-10",
+      buttons: [
+        {
+          text: "Back",
+          action: tour.back,
+          classes: "default-button",
+        },
+        {
+          text: 'Next',
+          action: tour.next,
+          classes: 'default-button px-4 py-2 rounded',
+        },
+      ],
+    });
+  
+    tour.addStep({
+      id: 'table',
+      title: 'Data Table',
+      text: 'This table displays the main data for machine productivity.',
+      attachTo: { element: '#table', on: 'top' },
+      scrollTo: false,
+      classes: 'mb-10',
+      buttons: [
+        {
+          text: "Back",
+          action: tour.back,
+          classes: "default-button",
+        },
+        {
+          text: 'Next',
+          action: tour.next,
+          classes: 'default-button px-4 py-2 rounded',
+        },
+      ],
+    });
+  
+    tour.addStep({
+      id: 'pagination',
+      title: 'Pagination',
+      text: 'Use the pagination controls to navigate between pages of data.',
+      attachTo: { element: '#pagination', on: 'top' },
+      scrollTo: false,
+      buttons: [
+        {
+          text: "Back",
+          action: tour.back,
+          classes: "default-button",
+        },
+        {
+          text: 'Finish',
+          action: tour.complete,
+          classes: 'default-button px-4 py-2 rounded',
+        },
+      ],
+    });
+  
+    tour.start();
+  };
+  
+  
+
   return (
     <div className="flex flex-col min-h-[29rem] justify-between">
       {loading || apiData.length === 0 ? (
@@ -175,12 +354,28 @@ export default function ProductivityTable() {
           <div className="space-y-5">
             <div className="flex justify-between">
               <div>
-                <h1 className="font-bold text-xl">Table</h1>
-                <h2 className="font-normal text-lg text-slate-500">
+                <div className="flex gap-2 items-center">
+                  <h1 className="font-bold text-xl" id="title-productivity">
+                    Table
+                  </h1>
+                  <Question
+                    size={20}
+                    weight="bold"
+                    onClick={startTour}
+                    className="cursor-pointer"
+                  />
+                </div>
+                <h2
+                  className="font-normal text-lg text-slate-500"
+                  id="sub-title"
+                >
                   Overview of Machine Productivity
                 </h2>
               </div>
-              <div className="flex w-full max-w-sm items-center space-x-2 mb-3">
+              <div
+                className="flex w-full max-w-sm items-center space-x-2 mb-3"
+                id="search"
+              >
                 <Input
                   type="text"
                   placeholder="Search"
@@ -206,7 +401,10 @@ export default function ProductivityTable() {
                   </svg>
                 </Button>
               </div>
-              <div className="flex w-full max-w-sm items-center space-x-2 mb-3 pl-5">
+              <div
+                className="flex w-full max-w-sm items-center space-x-2 mb-3 pl-5"
+                id="export"
+              >
                 <div className="flex gap-3">
                   <div className="relative">
                     <Input
@@ -277,7 +475,7 @@ export default function ProductivityTable() {
                 </Button>
               </div>
             </div>
-            <div>
+            <div id="filter-button">
               <FilterDropdowns
                 uniqueValues={uniqueValues}
                 selectedFilters={selectedFilters}
@@ -285,50 +483,52 @@ export default function ProductivityTable() {
                 fieldLabels={fieldLabels}
               />
             </div>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="font-black">No</TableHead>
-                  <TableHead>Object Type</TableHead>
-                  <TableHead>Object ID</TableHead>
-                  <TableHead>Object Group</TableHead>
-                  <TableHead>Object Code</TableHead>
-                  <TableHead>Output Capacity</TableHead>
-                  <TableHead>Output UOM</TableHead>
-                  <TableHead>Output Time</TableHead>
-                  <TableHead>Output Cost</TableHead>
-                  <TableHead>Start Date</TableHead>
-                  <TableHead>End Date</TableHead>
-                  <TableHead>Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {currentData.map((productivity, index) => (
-                  <TableRow key={productivity.id}>
-                    <TableCell className="font-black">
-                      {indexOfFirstItem + index + 1}
-                    </TableCell>
-                    <TableCell>{productivity.objecttype.trim()}</TableCell>
-                    <TableCell>{productivity.objectid.trim()}</TableCell>
-                    <TableCell>{productivity.objectgroup.trim()}</TableCell>
-                    <TableCell>{productivity.objectcode.trim()}</TableCell>
-                    <TableCell>
-                      {parseFloat(productivity.outputcapacity).toString()}
-                    </TableCell>
-                    <TableCell>{productivity.outputuom.trim()}</TableCell>
-                    <TableCell>{productivity.outputtime.trim()}</TableCell>
-                    <TableCell>
-                      {parseFloat(productivity.outputcost).toString()}
-                    </TableCell>
-                    <TableCell>{productivity.startdate}</TableCell>
-                    <TableCell>{productivity.enddate}</TableCell>
-                    <TableCell>{productivity.objectstatus.trim()}</TableCell>
+            <div id="table" className="h-fit w-fit">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="font-black">No</TableHead>
+                    <TableHead>Object Type</TableHead>
+                    <TableHead>Object ID</TableHead>
+                    <TableHead>Object Group</TableHead>
+                    <TableHead>Object Code</TableHead>
+                    <TableHead>Output Capacity</TableHead>
+                    <TableHead>Output UOM</TableHead>
+                    <TableHead>Output Time</TableHead>
+                    <TableHead>Output Cost</TableHead>
+                    <TableHead>Start Date</TableHead>
+                    <TableHead>End Date</TableHead>
+                    <TableHead>Status</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {currentData.map((productivity, index) => (
+                    <TableRow key={productivity.id}>
+                      <TableCell className="font-black">
+                        {indexOfFirstItem + index + 1}
+                      </TableCell>
+                      <TableCell>{productivity.objecttype.trim()}</TableCell>
+                      <TableCell>{productivity.objectid.trim()}</TableCell>
+                      <TableCell>{productivity.objectgroup.trim()}</TableCell>
+                      <TableCell>{productivity.objectcode.trim()}</TableCell>
+                      <TableCell>
+                        {parseFloat(productivity.outputcapacity).toString()}
+                      </TableCell>
+                      <TableCell>{productivity.outputuom.trim()}</TableCell>
+                      <TableCell>{productivity.outputtime.trim()}</TableCell>
+                      <TableCell>
+                        {parseFloat(productivity.outputcost).toString()}
+                      </TableCell>
+                      <TableCell>{productivity.startdate}</TableCell>
+                      <TableCell>{productivity.enddate}</TableCell>
+                      <TableCell>{productivity.objectstatus.trim()}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </div>
-          <div className="flex justify-center w-full">
+          <div className="flex justify-center w-full" id="pagination">
             <Stack spacing={2} mt={2}>
               <Pagination
                 count={totalPages}

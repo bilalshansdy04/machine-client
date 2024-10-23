@@ -20,9 +20,9 @@ import {
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import { ChartFetchData } from "../../utils/fetchData/chart-fetch-data.ts";
 import { Question } from "@phosphor-icons/react";
-import Shepherd from 'shepherd.js';
-import 'shepherd.js/dist/css/shepherd.css';
-import '../../style/shepherd-theme-custom.css'
+import Shepherd from "shepherd.js";
+import "shepherd.js/dist/css/shepherd.css";
+import "../../style/shepherd-theme-custom.css";
 
 export default function Chart() {
   const [data, setApiData] = React.useState<any[]>([]);
@@ -46,64 +46,67 @@ export default function Chart() {
       useModalOverlay: true,
       defaultStepOptions: {
         scrollTo: true,
-      }
+      },
     });
 
     // Step for Title
     tour.addStep({
-      id: 'title',
-      text: 'This title section highlights the chart displayed here.',
-      attachTo: { element: '#title', on: 'bottom' },
+      id: "title",
+      title: "Title",
+      text: "This title section highlights the chart displayed here.",
+      attachTo: { element: "#title-chart", on: "bottom" },
       scrollTo: false,
-      classes: 'title',
+      classes: "title",
       buttons: [
         {
-          text: 'Next',
+          text: "Next",
           action: tour.next,
-          classes: 'default-button'
-        }
-      ]
+          classes: "default-button",
+        },
+      ],
     });
 
     // Step for Dropdown
     tour.addStep({
-      id: 'dropdown',
-      text: 'Press this button to select an object code, and then choose whether to view the output capacity or output cost. The chart will be displayed after making a selection.',
-      attachTo: { element: '#dropdown', on: 'left' },
+      id: "dropdown",
+      title: "Dropdown",
+      text: "Press this button to select an object code, and then choose whether to view the output capacity or output cost. The chart will be displayed after making a selection.",
+      attachTo: { element: "#dropdown", on: "left" },
       scrollTo: false,
-      classes:'dropdown',
+      classes: "dropdown",
       buttons: [
         {
-          text: 'Back',
+          text: "Back",
           action: tour.back,
-          classes: 'default-button'
+          classes: "default-button",
         },
         {
-          text: 'Next',
+          text: "Next",
           action: tour.next,
-          classes: 'default-button'
+          classes: "default-button",
         },
-      ]
+      ],
     });
 
     // Step for Chart
     tour.addStep({
-      id: 'chart',
-      text: 'This is the chart section. It will not be displayed until an object code is selected.',
-      attachTo: { element: '#chart', on: 'top' },
+      id: "chart",
+      title: "Chart Display",
+      text: "This is the chart section. It will not be displayed until an object code is selected.",
+      attachTo: { element: "#chart", on: "top" },
       scrollTo: false,
       buttons: [
         {
-          text: 'Back',
+          text: "Back",
           action: tour.back,
-          classes: 'default-button'
+          classes: "default-button",
         },
         {
-          text: 'Done',
+          text: "Done",
           action: tour.complete,
-          classes: 'default-button'
+          classes: "default-button",
         },
-      ]
+      ],
     });
 
     // Start the tour
@@ -149,8 +152,15 @@ export default function Chart() {
       <div className="flex gap-6 justify-between mb-5">
         <div>
           <div className="flex gap-2 items-center">
-            <h1 className="font-bold text-xl p-1" id="title">Chart</h1>
-            <Question size={20} weight="bold" onClick={startTour} className="cursor-pointer"/>
+            <h1 className="font-bold text-xl p-1" id="title-chart">
+              Chart
+            </h1>
+            <Question
+              size={20}
+              weight="bold"
+              onClick={startTour}
+              className="cursor-pointer"
+            />
           </div>
           <h2 className="font-normal text-lg text-slate-500">
             Visual Representation of Machine Data
