@@ -217,7 +217,7 @@ export default function ProductivityTable() {
       id: 'sub-title',
       title: 'Table Overview',
       text: 'This subtitle indicates that this table contains machine productivity data.',
-      attachTo: { element: '#sub-title', on: 'bottom' },
+      attachTo: { element: '#sub-title-productivity', on: 'bottom' },
       scrollTo: false,
       classes: "mt-10",
       buttons: [
@@ -238,7 +238,7 @@ export default function ProductivityTable() {
       id: 'search',
       title: 'Search',
       text: `Use this search box to quickly find the data you're looking for.`,
-      attachTo: { element: '#search', on: 'bottom' },
+      attachTo: { element: '#search-productivity', on: 'bottom' },
       scrollTo: false,
       classes: "mt-10",
       buttons: [
@@ -259,7 +259,7 @@ export default function ProductivityTable() {
       id: 'export',
       title: 'Export Data',
       text: 'Use this feature to export data to PDF. Select specific pages from the table to export.',
-      attachTo: { element: '#export', on: 'bottom' },
+      attachTo: { element: '#export-productivity', on: 'bottom' },
       scrollTo: false,
       classes: "mt-10",
       buttons: [
@@ -301,7 +301,7 @@ export default function ProductivityTable() {
       id: 'table',
       title: 'Data Table',
       text: 'This table displays the main data for machine productivity.',
-      attachTo: { element: '#table', on: 'top' },
+      attachTo: { element: '#table-productivity', on: 'top' },
       scrollTo: false,
       classes: 'mb-10',
       buttons: [
@@ -322,7 +322,7 @@ export default function ProductivityTable() {
       id: 'pagination',
       title: 'Pagination',
       text: 'Use the pagination controls to navigate between pages of data.',
-      attachTo: { element: '#pagination', on: 'top' },
+      attachTo: { element: '#pagination-productivity', on: 'top' },
       scrollTo: false,
       buttons: [
         {
@@ -367,14 +367,14 @@ export default function ProductivityTable() {
                 </div>
                 <h2
                   className="font-normal text-lg text-slate-500"
-                  id="sub-title"
+                  id="sub-title-productivity"
                 >
                   Overview of Machine Productivity
                 </h2>
               </div>
               <div
                 className="flex w-full max-w-sm items-center space-x-2 mb-3"
-                id="search"
+                id="search-productivity"
               >
                 <Input
                   type="text"
@@ -403,7 +403,7 @@ export default function ProductivityTable() {
               </div>
               <div
                 className="flex w-full max-w-sm items-center space-x-2 mb-3 pl-5"
-                id="export"
+                id="export-productivity"
               >
                 <div className="flex gap-3">
                   <div className="relative">
@@ -483,7 +483,7 @@ export default function ProductivityTable() {
                 fieldLabels={fieldLabels}
               />
             </div>
-            <div id="table" className="h-fit w-fit">
+            <div id="table-productivity" className="h-fit w-fit">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -528,7 +528,7 @@ export default function ProductivityTable() {
               </Table>
             </div>
           </div>
-          <div className="flex justify-center w-full" id="pagination">
+          <div className="flex justify-center w-full" id="pagination-productivity">
             <Stack spacing={2} mt={2}>
               <Pagination
                 count={totalPages}
