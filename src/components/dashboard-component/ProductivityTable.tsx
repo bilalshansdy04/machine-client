@@ -7,20 +7,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Input } from "../ui/input.tsx";
+import { Button } from "../ui/button.tsx";
 
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
-
-import { Input } from "../ui/input.tsx";
-import { Button } from "../ui/button.tsx";
 
 import { grid } from "ldrs";
 
 import { FilterDropdowns } from "./FilterDropdowns.tsx";
 
 import { MachineProductivity } from "../../utils/interface/interface.ts";
-import { exportTableToPDF } from "../../utils/convertToPDF.ts";
 import { ProductivityFetchData } from "../../utils/fetchData/productivity-fetch-data.ts";
+import { exportTableToPDF } from "../../utils/convertToPDF.ts";
+
 import { Question } from "@phosphor-icons/react";
 
 import Shepherd from "shepherd.js";
@@ -66,16 +66,32 @@ export default function ProductivityTable() {
   };
 
   useEffect(() => {
-    const fetchAndSetData = async () => {
-      setLoading(true);
-      const data = await ProductivityFetchData();
-      if (data) {
-        setApiData(data);
+    const ws = new WebSocket("ws://localhost:8080");
+
+    ws.onmessage = (event) => {
+      const newData = JSON.parse(event.data);
+      console.log("Data dari WebSocket:", newData); // Tambahkan log untuk memeriksa data
+
+      // Jika data berisi property 'productivityData', gunakan itu
+      if (newData && Array.isArray(newData.productivityData)) {
+        console.log("Menggunakan data dari productivityData");
+        setApiData(newData.productivityData); // Set array dari productivityData ke state apiData
+      } else {
+        console.log("Data bukan array:", newData); // Jika data bukan array, log detailnya
+        setApiData([]); // Set array kosong jika data tidak valid
       }
+
       setLoading(false);
     };
 
-    fetchAndSetData();
+    ws.onerror = (error) => {
+      console.error("WebSocket error:", error);
+      setLoading(false);
+    };
+
+    return () => {
+      ws.close();
+    };
   }, []);
 
   const uniqueValues = useMemo(() => {
@@ -174,7 +190,7 @@ export default function ProductivityTable() {
     if (Shepherd.activeTour) {
       Shepherd.activeTour.complete();
     }
-  
+
     const tour: Shepherd.Tour = new Shepherd.Tour({
       useModalOverlay: true,
       defaultStepOptions: {
@@ -184,40 +200,40 @@ export default function ProductivityTable() {
         },
         buttons: [
           {
-            text: 'Back',
+            text: "Back",
             action: () => tour.back(),
-            classes: 'default-button px-4 py-2 rounded',
+            classes: "default-button px-4 py-2 rounded",
           },
           {
-            text: 'Close',
+            text: "Close",
             action: () => tour.cancel(),
-            classes: 'default-button px-4 py-2 rounded',
+            classes: "default-button px-4 py-2 rounded",
           },
         ],
       },
     });
-  
+
     tour.addStep({
-      id: 'title',
-      title: 'Table Title',
-      text: 'This is the title for the table.',
-      attachTo: { element: '#title-productivity', on: 'bottom' },
+      id: "title",
+      title: "Table Title",
+      text: "This is the title for the table.",
+      attachTo: { element: "#title-productivity", on: "bottom" },
       scrollTo: false,
       classes: "mt-10",
       buttons: [
         {
-          text: 'Next',
+          text: "Next",
           action: tour.next,
-          classes: 'default-button px-4 py-2 rounded',
+          classes: "default-button px-4 py-2 rounded",
         },
       ],
     });
-  
+
     tour.addStep({
-      id: 'sub-title',
-      title: 'Table Overview',
-      text: 'This subtitle indicates that this table contains machine productivity data.',
-      attachTo: { element: '#sub-title-productivity', on: 'bottom' },
+      id: "sub-title",
+      title: "Table Overview",
+      text: "This subtitle indicates that this table contains machine productivity data.",
+      attachTo: { element: "#sub-title-productivity", on: "bottom" },
       scrollTo: false,
       classes: "mt-10",
       buttons: [
@@ -227,18 +243,18 @@ export default function ProductivityTable() {
           classes: "default-button",
         },
         {
-          text: 'Next',
+          text: "Next",
           action: tour.next,
-          classes: 'default-button px-4 py-2 rounded',
+          classes: "default-button px-4 py-2 rounded",
         },
       ],
     });
-  
+
     tour.addStep({
-      id: 'search',
-      title: 'Search',
+      id: "search",
+      title: "Search",
       text: `Use this search box to quickly find the data you're looking for.`,
-      attachTo: { element: '#search-productivity', on: 'bottom' },
+      attachTo: { element: "#search-productivity", on: "bottom" },
       scrollTo: false,
       classes: "mt-10",
       buttons: [
@@ -248,18 +264,18 @@ export default function ProductivityTable() {
           classes: "default-button",
         },
         {
-          text: 'Next',
+          text: "Next",
           action: tour.next,
-          classes: 'default-button px-4 py-2 rounded',
+          classes: "default-button px-4 py-2 rounded",
         },
       ],
     });
-  
+
     tour.addStep({
-      id: 'export',
-      title: 'Export Data',
-      text: 'Use this feature to export data to PDF. Select specific pages from the table to export.',
-      attachTo: { element: '#export-productivity', on: 'bottom' },
+      id: "export",
+      title: "Export Data",
+      text: "Use this feature to export data to PDF. Select specific pages from the table to export.",
+      attachTo: { element: "#export-productivity", on: "bottom" },
       scrollTo: false,
       classes: "mt-10",
       buttons: [
@@ -269,18 +285,18 @@ export default function ProductivityTable() {
           classes: "default-button",
         },
         {
-          text: 'Next',
+          text: "Next",
           action: tour.next,
-          classes: 'default-button px-4 py-2 rounded',
+          classes: "default-button px-4 py-2 rounded",
         },
       ],
     });
-  
+
     tour.addStep({
-      id: 'filter-button',
-      title: 'Filter Button',
-      text: 'This button is used to filter the displayed data according to your selected criteria.',
-      attachTo: { element: '#filter-button', on: 'bottom' },
+      id: "filter-button",
+      title: "Filter Button",
+      text: "This button is used to filter the displayed data according to your selected criteria.",
+      attachTo: { element: "#filter-button", on: "bottom" },
       scrollTo: false,
       classes: "mt-10",
       buttons: [
@@ -290,20 +306,20 @@ export default function ProductivityTable() {
           classes: "default-button",
         },
         {
-          text: 'Next',
+          text: "Next",
           action: tour.next,
-          classes: 'default-button px-4 py-2 rounded',
+          classes: "default-button px-4 py-2 rounded",
         },
       ],
     });
-  
+
     tour.addStep({
-      id: 'table',
-      title: 'Data Table',
-      text: 'This table displays the main data for machine productivity.',
-      attachTo: { element: '#table-productivity', on: 'top' },
+      id: "table",
+      title: "Data Table",
+      text: "This table displays the main data for machine productivity.",
+      attachTo: { element: "#table-productivity", on: "top" },
       scrollTo: false,
-      classes: 'mb-10',
+      classes: "mb-10",
       buttons: [
         {
           text: "Back",
@@ -311,18 +327,18 @@ export default function ProductivityTable() {
           classes: "default-button",
         },
         {
-          text: 'Next',
+          text: "Next",
           action: tour.next,
-          classes: 'default-button px-4 py-2 rounded',
+          classes: "default-button px-4 py-2 rounded",
         },
       ],
     });
-  
+
     tour.addStep({
-      id: 'pagination',
-      title: 'Pagination',
-      text: 'Use the pagination controls to navigate between pages of data.',
-      attachTo: { element: '#pagination-productivity', on: 'top' },
+      id: "pagination",
+      title: "Pagination",
+      text: "Use the pagination controls to navigate between pages of data.",
+      attachTo: { element: "#pagination-productivity", on: "top" },
       scrollTo: false,
       buttons: [
         {
@@ -331,17 +347,15 @@ export default function ProductivityTable() {
           classes: "default-button",
         },
         {
-          text: 'Finish',
+          text: "Finish",
           action: tour.complete,
-          classes: 'default-button px-4 py-2 rounded',
+          classes: "default-button px-4 py-2 rounded",
         },
       ],
     });
-  
+
     tour.start();
   };
-  
-  
 
   return (
     <div className="flex flex-col min-h-[29rem] justify-between">
@@ -502,22 +516,20 @@ export default function ProductivityTable() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {currentData.map((productivity, index) => (
-                    <TableRow key={productivity.id}>
-                      <TableCell className="font-black">
-                        {indexOfFirstItem + index + 1}
-                      </TableCell>
+                  {apiData.map((productivity, index) => (
+                    <TableRow key={index}>
+                      <TableCell className="font-black">{index + 1}</TableCell>
                       <TableCell>{productivity.objecttype.trim()}</TableCell>
                       <TableCell>{productivity.objectid.trim()}</TableCell>
                       <TableCell>{productivity.objectgroup.trim()}</TableCell>
                       <TableCell>{productivity.objectcode.trim()}</TableCell>
                       <TableCell>
-                        {parseFloat(productivity.outputcapacity).toString()}
+                        {parseFloat(productivity.outputcapacity).toFixed(2)}
                       </TableCell>
                       <TableCell>{productivity.outputuom.trim()}</TableCell>
                       <TableCell>{productivity.outputtime.trim()}</TableCell>
                       <TableCell>
-                        {parseFloat(productivity.outputcost).toString()}
+                        {parseFloat(productivity.outputcost).toFixed(2)}
                       </TableCell>
                       <TableCell>{productivity.startdate}</TableCell>
                       <TableCell>{productivity.enddate}</TableCell>
@@ -528,7 +540,10 @@ export default function ProductivityTable() {
               </Table>
             </div>
           </div>
-          <div className="flex justify-center w-full" id="pagination-productivity">
+          <div
+            className="flex justify-center w-full"
+            id="pagination-productivity"
+          >
             <Stack spacing={2} mt={2}>
               <Pagination
                 count={totalPages}
