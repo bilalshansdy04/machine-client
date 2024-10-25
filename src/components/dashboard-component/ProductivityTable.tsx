@@ -63,6 +63,7 @@ export default function ProductivityTable() {
       ...prevFilters,
       [field]: value.includes("All") ? "" : value,
     }));
+    setCurrentPage(1);
   };
 
   useEffect(() => {
@@ -70,15 +71,10 @@ export default function ProductivityTable() {
 
     ws.onmessage = (event) => {
       const newData = JSON.parse(event.data);
-      console.log("Data dari WebSocket:", newData); // Tambahkan log untuk memeriksa data
-
-      // Jika data berisi property 'productivityData', gunakan itu
       if (newData && Array.isArray(newData.productivityData)) {
-        console.log("Menggunakan data dari productivityData");
-        setApiData(newData.productivityData); // Set array dari productivityData ke state apiData
+        setApiData(newData.productivityData);
       } else {
-        console.log("Data bukan array:", newData); // Jika data bukan array, log detailnya
-        setApiData([]); // Set array kosong jika data tidak valid
+        setApiData([]);
       }
 
       setLoading(false);
@@ -117,34 +113,36 @@ export default function ProductivityTable() {
 
   const handleSearchSubmit = () => {
     setConfirmedSearchTerm(searchTerm);
-    setCurrentPage(1);
+    setCurrentPage(1); // Reset pagination ke halaman pertama setelah search diterapkan
   };
 
-  const filteredAndSearchedData = apiData.filter((productivity) => {
-    const dropdownFiltersMatch = Object.keys(selectedFilters).every((key) => {
-      const field = key as keyof MachineProductivity;
-      const filterValue = selectedFilters[field];
+  const filteredAndSearchedData = useMemo(() => {
+    return apiData.filter((productivity) => {
+      const dropdownFiltersMatch = Object.keys(selectedFilters).every((key) => {
+        const field = key as keyof MachineProductivity;
+        const filterValue = selectedFilters[field];
 
-      if (!filterValue || filterValue === "All") return true;
+        if (!filterValue || filterValue === "All") return true;
 
-      if (field === "outputcapacity") {
-        const capacityValue = parseFloat(productivity[field]);
-        return (
-          !isNaN(capacityValue) && capacityValue === parseFloat(filterValue)
-        );
-      }
+        if (field === "outputcapacity") {
+          const capacityValue = parseFloat(productivity[field]);
+          return (
+            !isNaN(capacityValue) && capacityValue === parseFloat(filterValue)
+          );
+        }
 
-      return productivity[field] === filterValue;
+        return productivity[field] === filterValue;
+      });
+
+      const searchInLower = confirmedSearchTerm.toLowerCase();
+      return (
+        dropdownFiltersMatch &&
+        Object.values(productivity).some((value) =>
+          value.toString().toLowerCase().includes(searchInLower)
+        )
+      );
     });
-
-    const searchInLower = confirmedSearchTerm.toLowerCase();
-    return (
-      dropdownFiltersMatch &&
-      Object.values(productivity).some((value) =>
-        value.toString().toLowerCase().includes(searchInLower)
-      )
-    );
-  });
+  }, [apiData, selectedFilters, confirmedSearchTerm]);
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -516,24 +514,22 @@ export default function ProductivityTable() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {apiData.map((productivity, index) => (
+                  {currentData.map((productivity, index) => (
                     <TableRow key={index}>
-                      <TableCell className="font-black">{index + 1}</TableCell>
-                      <TableCell>{productivity.objecttype.trim()}</TableCell>
-                      <TableCell>{productivity.objectid.trim()}</TableCell>
-                      <TableCell>{productivity.objectgroup.trim()}</TableCell>
-                      <TableCell>{productivity.objectcode.trim()}</TableCell>
-                      <TableCell>
-                        {parseFloat(productivity.outputcapacity).toFixed(2)}
+                      <TableCell className="font-black">
+                        {indexOfFirstItem + index + 1}
                       </TableCell>
-                      <TableCell>{productivity.outputuom.trim()}</TableCell>
-                      <TableCell>{productivity.outputtime.trim()}</TableCell>
-                      <TableCell>
-                        {parseFloat(productivity.outputcost).toFixed(2)}
-                      </TableCell>
+                      <TableCell>{productivity.objecttype}</TableCell>
+                      <TableCell>{productivity.objectid}</TableCell>
+                      <TableCell>{productivity.objectgroup}</TableCell>
+                      <TableCell>{productivity.objectcode}</TableCell>
+                      <TableCell>{productivity.outputcapacity}</TableCell>
+                      <TableCell>{productivity.outputuom}</TableCell>
+                      <TableCell>{productivity.outputtime}</TableCell>
+                      <TableCell>{productivity.outputcost}</TableCell>
                       <TableCell>{productivity.startdate}</TableCell>
                       <TableCell>{productivity.enddate}</TableCell>
-                      <TableCell>{productivity.objectstatus.trim()}</TableCell>
+                      <TableCell>{productivity.status}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -544,7 +540,7 @@ export default function ProductivityTable() {
             className="flex justify-center w-full"
             id="pagination-productivity"
           >
-            <Stack spacing={2} mt={2}>
+            <Stack spacing={2} className="items-center mt-2">
               <Pagination
                 count={totalPages}
                 page={currentPage}
@@ -559,16 +555,9 @@ export default function ProductivityTable() {
   );
 }
 
-// Helper function to get unique values for dropdowns
-const getUniqueValues = (
+function getUniqueValues(
   data: MachineProductivity[],
   field: keyof MachineProductivity
-): string[] => {
-  const values = data.map((item) => {
-    if (field === "outputcapacity") return item.outputcapacity || "0";
-    if (field === "startdate") return item.startdate || "";
-    return item[field]?.toString() || "";
-  });
-
-  return Array.from(new Set(values)).filter((val) => val !== "");
-};
+) {
+  return [...new Set(data.map((item) => item[field]))];
+}
