@@ -13,23 +13,38 @@ import { blueIcon, redIcon, starIcon } from "../map-ui/MapIcons.ts";
 import "leaflet/dist/leaflet.css";
 
 export default function Maps() {
-  const [apiData, setApiData] = useState([]);
+  const [apiData, setApiData] = useState([]);  
+  const [loading, setLoading] = useState(true);
   const [productivityData, setProductivityData] = useState([]);
   const [profileData, setProfileData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchAndSetData = async () => {
-      const data = await MapsFetchData();
-      if (data) {
-        setApiData(data.apiData);
-        setProductivityData(data.productivityData);
-        setProfileData(data.profileData);
-      }
-      setIsLoading(false);
+    setLoading(true);
+    const ws = new WebSocket("ws://localhost:8080");
+
+    ws.onopen = () => {
+      console.log("WebSocket connected for RecordTable");
     };
 
-    fetchAndSetData();
+    ws.onmessage = (event) => {
+      const newData = JSON.parse(event.data);
+      if (newData && Array.isArray(newData.mapsData)) {
+        setApiData(newData.mapsData);
+      } else {
+        setApiData([]);
+      }
+
+      setLoading(false);
+    };
+
+    ws.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+
+    return () => {
+      ws.close();
+    };
   }, []);
 
   const getLatestOutputCapacity = (objectId: string) => {
