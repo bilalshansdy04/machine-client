@@ -18,7 +18,6 @@ import { grid } from "ldrs";
 import { FilterDropdowns } from "./FilterDropdowns.tsx";
 
 import { MachineProductivity } from "../../utils/interface/interface.ts";
-import { ProductivityFetchData } from "../../utils/fetchData/productivity-fetch-data.ts";
 import { exportTableToPDF } from "../../utils/convertToPDF.ts";
 
 import { Question } from "@phosphor-icons/react";

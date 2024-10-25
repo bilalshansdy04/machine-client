@@ -17,7 +17,6 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 
 import { exportTableToPDF } from "../../utils/convertToPDF.ts";
-import { RecordFetchData } from "@/utils/fetchData/record-fetch-data.ts";
 import { MachineRecord } from "../../utils/interface/interface.ts";
 
 import Shepherd from "shepherd.js";
@@ -27,30 +26,11 @@ import { Question } from "@phosphor-icons/react";
 
 grid.register();
 
-const useFetchData = (currentPage: number) => {
-  const [apiData, setApiData] = useState<MachineRecord[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchAndSetData = async () => {
-      setLoading(true);
-      const data = await RecordFetchData();
-      if (data) {
-        setApiData(data);
-      }
-      setLoading(false);
-    };
-
-    fetchAndSetData();
-  }, [currentPage]);
-
-  return { apiData, loading };
-};
 
 export default function RecordTable() {
+  const [apiData, setApiData] = useState<MachineRecord[]>([]);
+  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const { apiData, loading } = useFetchData(currentPage);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [confirmedSearchTerm, setConfirmedSearchTerm] = useState("");
   const [startPage, setStartPage] = useState<number | "">("");
@@ -61,6 +41,34 @@ export default function RecordTable() {
   const [isFocusedEndPage, setIsFocusedEndPage] = useState(false);
 
   const itemsPerPage = 3;
+
+  useEffect(() => {
+    setLoading(true);
+    const ws = new WebSocket("ws://localhost:8080");
+
+    ws.onopen = () => {
+      console.log("WebSocket connected for RecordTable");
+    };
+
+    ws.onmessage = (event) => {
+      const newData = JSON.parse(event.data);
+      if (newData && Array.isArray(newData.recordData)) {
+        setApiData(newData.recordData);
+      } else {
+        setApiData([]);
+      }
+
+      setLoading(false);
+    };
+
+    ws.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+
+    return () => {
+      ws.close();
+    };
+  }, []);
 
   const handleSearchChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
