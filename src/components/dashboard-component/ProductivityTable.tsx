@@ -26,6 +26,8 @@ import Shepherd from "shepherd.js";
 import "shepherd.js/dist/css/shepherd.css";
 import "../../style/shepherd-theme-custom.css";
 
+import io from "socket.io-client";
+
 grid.register();
 
 const fieldLabels = {
@@ -66,28 +68,26 @@ export default function ProductivityTable() {
   };
 
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:8080");
+    const socket = io('http://localhost:3000', {
+      transports: ['websocket', 'polling']
+    });
 
-    ws.onmessage = (event) => {
-      const newData = JSON.parse(event.data);
-      if (newData && Array.isArray(newData.productivityData)) {
-        setApiData(newData.productivityData);
+    socket.on('data_update', (newData) => {
+      console.log("Data received from server:", newData);
+      if (newData && newData.productivity) {
+        console.log("Productivity data received:", newData.productivity);
+        setApiData(newData.productivity);
+        setLoading(false);
       } else {
-        setApiData([]);
+        console.error("Data productivity tidak ditemukan");
       }
-
-      setLoading(false);
-    };
-
-    ws.onerror = (error) => {
-      console.error("WebSocket error:", error);
-      setLoading(false);
-    };
+    });
 
     return () => {
-      ws.close();
+      socket.disconnect();
     };
   }, []);
+  
 
   const uniqueValues = useMemo(() => {
     const sortedOutputCapacity = getUniqueValues(apiData, "outputcapacity")
@@ -353,6 +353,7 @@ export default function ProductivityTable() {
 
     tour.start();
   };
+  console.log("Current data for display:", currentData);
 
   return (
     <div className="flex flex-col min-h-[29rem] justify-between">

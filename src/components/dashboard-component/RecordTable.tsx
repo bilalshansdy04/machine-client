@@ -44,7 +44,7 @@ export default function RecordTable() {
 
   useEffect(() => {
     setLoading(true);
-    const ws = new WebSocket("ws://localhost:8080");
+    const ws = new WebSocket("ws://localhost:3000");
 
     ws.onopen = () => {
       console.log("WebSocket connected for RecordTable");
@@ -61,9 +61,16 @@ export default function RecordTable() {
       setLoading(false);
     };
 
-    ws.onclose = () => {
-      console.log("WebSocket connection closed");
-    };
+    ws.onclose = (event) => {
+      console.log('WebSocket closed:', event);
+      if (!event.wasClean) {
+          console.error(`Connection closed with code: ${event.code}, reason: ${event.reason}`);
+          if (event.code === 1006) {
+              console.error("Connection closed abnormally, error code: 1006"); // Log untuk error 1006
+          }
+      }
+  };
+
 
     return () => {
       ws.close();

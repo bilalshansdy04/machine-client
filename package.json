@@ -40,6 +40,7 @@
     "react-router-dom": "^6.26.1",
     "recharts": "^2.12.7",
     "shepherd.js": "^14.1.0",
+    "socket.io-client": "^4.8.1",
     "styled-components": "^6.1.12",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7"
