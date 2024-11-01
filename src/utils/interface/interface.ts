@@ -28,6 +28,7 @@ export interface MachineId {
     objecttype: string;
     objectgroup: string;
     objectid: string;
+    objectcode: string;
     outputcapacity: number;
     outputuom: string;
     outputtime: string;

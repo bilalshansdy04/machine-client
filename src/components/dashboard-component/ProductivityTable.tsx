@@ -13,6 +13,8 @@ import { Button } from "../ui/button.tsx";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 
+import io from "socket.io-client";
+
 import { grid } from "ldrs";
 
 import { FilterDropdowns } from "./FilterDropdowns.tsx";
@@ -22,11 +24,7 @@ import { exportTableToPDF } from "../../utils/convertToPDF.ts";
 
 import { Question } from "@phosphor-icons/react";
 
-import Shepherd from "shepherd.js";
-import "shepherd.js/dist/css/shepherd.css";
-import "../../style/shepherd-theme-custom.css";
-
-import io from "socket.io-client";
+import { startTourProductivity } from "@/utils/guide/guide-productivity.ts";
 
 grid.register();
 
@@ -68,11 +66,12 @@ export default function ProductivityTable() {
   };
 
   useEffect(() => {
-    const socket = io('http://localhost:3000', {
-      transports: ['websocket', 'polling']
+    const SOCKET_URL = import.meta.env.VITE_URL_SOCKET;
+    const socket = io(SOCKET_URL, {
+      transports: ["websocket", "polling"],
     });
 
-    socket.on('data_update', (newData) => {
+    socket.on("data_update", (newData) => {
       console.log("Data received from server:", newData);
       if (newData && newData.productivity) {
         console.log("Productivity data received:", newData.productivity);
@@ -87,7 +86,6 @@ export default function ProductivityTable() {
       socket.disconnect();
     };
   }, []);
-  
 
   const uniqueValues = useMemo(() => {
     const sortedOutputCapacity = getUniqueValues(apiData, "outputcapacity")
@@ -182,179 +180,6 @@ export default function ProductivityTable() {
     );
   };
 
-  const startTour = () => {
-    // Hentikan atau selesaikan tour jika sudah berjalan
-    if (Shepherd.activeTour) {
-      Shepherd.activeTour.complete();
-    }
-
-    const tour: Shepherd.Tour = new Shepherd.Tour({
-      useModalOverlay: true,
-      defaultStepOptions: {
-        scrollTo: true,
-        cancelIcon: {
-          enabled: true,
-        },
-        buttons: [
-          {
-            text: "Back",
-            action: () => tour.back(),
-            classes: "default-button px-4 py-2 rounded",
-          },
-          {
-            text: "Close",
-            action: () => tour.cancel(),
-            classes: "default-button px-4 py-2 rounded",
-          },
-        ],
-      },
-    });
-
-    tour.addStep({
-      id: "title",
-      title: "Table Title",
-      text: "This is the title for the table.",
-      attachTo: { element: "#title-productivity", on: "bottom" },
-      scrollTo: false,
-      classes: "mt-10",
-      buttons: [
-        {
-          text: "Next",
-          action: tour.next,
-          classes: "default-button px-4 py-2 rounded",
-        },
-      ],
-    });
-
-    tour.addStep({
-      id: "sub-title",
-      title: "Table Overview",
-      text: "This subtitle indicates that this table contains machine productivity data.",
-      attachTo: { element: "#sub-title-productivity", on: "bottom" },
-      scrollTo: false,
-      classes: "mt-10",
-      buttons: [
-        {
-          text: "Back",
-          action: tour.back,
-          classes: "default-button",
-        },
-        {
-          text: "Next",
-          action: tour.next,
-          classes: "default-button px-4 py-2 rounded",
-        },
-      ],
-    });
-
-    tour.addStep({
-      id: "search",
-      title: "Search",
-      text: `Use this search box to quickly find the data you're looking for.`,
-      attachTo: { element: "#search-productivity", on: "bottom" },
-      scrollTo: false,
-      classes: "mt-10",
-      buttons: [
-        {
-          text: "Back",
-          action: tour.back,
-          classes: "default-button",
-        },
-        {
-          text: "Next",
-          action: tour.next,
-          classes: "default-button px-4 py-2 rounded",
-        },
-      ],
-    });
-
-    tour.addStep({
-      id: "export",
-      title: "Export Data",
-      text: "Use this feature to export data to PDF. Select specific pages from the table to export.",
-      attachTo: { element: "#export-productivity", on: "bottom" },
-      scrollTo: false,
-      classes: "mt-10",
-      buttons: [
-        {
-          text: "Back",
-          action: tour.back,
-          classes: "default-button",
-        },
-        {
-          text: "Next",
-          action: tour.next,
-          classes: "default-button px-4 py-2 rounded",
-        },
-      ],
-    });
-
-    tour.addStep({
-      id: "filter-button",
-      title: "Filter Button",
-      text: "This button is used to filter the displayed data according to your selected criteria.",
-      attachTo: { element: "#filter-button", on: "bottom" },
-      scrollTo: false,
-      classes: "mt-10",
-      buttons: [
-        {
-          text: "Back",
-          action: tour.back,
-          classes: "default-button",
-        },
-        {
-          text: "Next",
-          action: tour.next,
-          classes: "default-button px-4 py-2 rounded",
-        },
-      ],
-    });
-
-    tour.addStep({
-      id: "table",
-      title: "Data Table",
-      text: "This table displays the main data for machine productivity.",
-      attachTo: { element: "#table-productivity", on: "top" },
-      scrollTo: false,
-      classes: "mb-10",
-      buttons: [
-        {
-          text: "Back",
-          action: tour.back,
-          classes: "default-button",
-        },
-        {
-          text: "Next",
-          action: tour.next,
-          classes: "default-button px-4 py-2 rounded",
-        },
-      ],
-    });
-
-    tour.addStep({
-      id: "pagination",
-      title: "Pagination",
-      text: "Use the pagination controls to navigate between pages of data.",
-      attachTo: { element: "#pagination-productivity", on: "top" },
-      scrollTo: false,
-      buttons: [
-        {
-          text: "Back",
-          action: tour.back,
-          classes: "default-button",
-        },
-        {
-          text: "Finish",
-          action: tour.complete,
-          classes: "default-button px-4 py-2 rounded",
-        },
-      ],
-    });
-
-    tour.start();
-  };
-  console.log("Current data for display:", currentData);
-
   return (
     <div className="flex flex-col min-h-[29rem] justify-between">
       {loading || apiData.length === 0 ? (
@@ -373,7 +198,7 @@ export default function ProductivityTable() {
                   <Question
                     size={20}
                     weight="bold"
-                    onClick={startTour}
+                    onClick={startTourProductivity}
                     className="cursor-pointer"
                   />
                 </div>
@@ -529,7 +354,7 @@ export default function ProductivityTable() {
                       <TableCell>{productivity.outputcost}</TableCell>
                       <TableCell>{productivity.startdate}</TableCell>
                       <TableCell>{productivity.enddate}</TableCell>
-                      <TableCell>{productivity.status}</TableCell>
+                      <TableCell>{productivity.objectstatus}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

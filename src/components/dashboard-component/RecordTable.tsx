@@ -19,10 +19,11 @@ import { Button } from "../ui/button";
 import { exportTableToPDF } from "../../utils/convertToPDF.ts";
 import { MachineRecord } from "../../utils/interface/interface.ts";
 
-import Shepherd from "shepherd.js";
-import "shepherd.js/dist/css/shepherd.css";
-import "../../style/shepherd-theme-custom.css";
 import { Question } from "@phosphor-icons/react";
+
+import io from "socket.io-client";
+
+import { startTourRecord } from "@/utils/guide/guide-record.ts";
 
 grid.register();
 
@@ -43,37 +44,24 @@ export default function RecordTable() {
   const itemsPerPage = 3;
 
   useEffect(() => {
-    setLoading(true);
-    const ws = new WebSocket("ws://localhost:3000");
+    const SOCKET_URL = import.meta.env.VITE_URL_SOCKET;
+    const socket = io(SOCKET_URL, {
+      transports: ['websocket', 'polling']
+    });
 
-    ws.onopen = () => {
-      console.log("WebSocket connected for RecordTable");
-    };
-
-    ws.onmessage = (event) => {
-      const newData = JSON.parse(event.data);
-      if (newData && Array.isArray(newData.recordData)) {
-        setApiData(newData.recordData);
+    socket.on('data_update', (newData) => {
+      console.log("Data received from server:", newData);
+      if (newData && newData.record) {
+        console.log("Productivity data received:", newData.record);
+        setApiData(newData.record);
+        setLoading(false);
       } else {
-        setApiData([]);
+        console.error("Data productivity tidak ditemukan");
       }
-
-      setLoading(false);
-    };
-
-    ws.onclose = (event) => {
-      console.log('WebSocket closed:', event);
-      if (!event.wasClean) {
-          console.error(`Connection closed with code: ${event.code}, reason: ${event.reason}`);
-          if (event.code === 1006) {
-              console.error("Connection closed abnormally, error code: 1006"); // Log untuk error 1006
-          }
-      }
-  };
-
+    });
 
     return () => {
-      ws.close();
+      socket.disconnect();
     };
   }, []);
 
@@ -132,156 +120,7 @@ export default function RecordTable() {
     []
   );
 
-  const startTour = () => {
-    // Hentikan atau selesaikan tour jika sudah berjalan
-    if (Shepherd.activeTour) {
-      Shepherd.activeTour.complete();
-    }
-  
-    const tour: Shepherd.Tour = new Shepherd.Tour({
-      useModalOverlay: true,
-      defaultStepOptions: {
-        scrollTo: true,
-        cancelIcon: {
-          enabled: true,
-        },
-        buttons: [
-          {
-            text: "Back",
-            action: () => tour.back(),
-            classes: "default-button px-4 py-2 rounded",
-          },
-          {
-            text: "Close",
-            action: () => tour.cancel(),
-            classes: "default-button px-4 py-2 rounded",
-          },
-        ],
-      },
-    });
-  
-    tour.addStep({
-      id: "title",
-      title: "Table Title",
-      text: "This is the title for the table.",
-      attachTo: { element: "#title-record", on: "bottom" },
-      scrollTo: false,
-      classes: "mt-10",
-      buttons: [
-        {
-          text: "Next",
-          action: tour.next,
-          classes: "default-button px-4 py-2 rounded",
-        },
-      ],
-    });
-  
-    tour.addStep({
-      id: "sub-title",
-      title: "Table Overview",
-      text: "This subtitle indicates that this table contains machine records data.",
-      attachTo: { element: "#sub-title-record", on: "bottom" },
-      scrollTo: false,
-      classes: "mt-10",
-      buttons: [
-        {
-          text: "Back",
-          action: tour.back,
-          classes: "default-button",
-        },
-        {
-          text: "Next",
-          action: tour.next,
-          classes: "default-button px-4 py-2 rounded",
-        },
-      ],
-    });
-  
-    tour.addStep({
-      id: "search",
-      title: "Search",
-      text: "Use this search box to quickly find the data you're looking for.",
-      attachTo: { element: "#search-record", on: "bottom" },
-      scrollTo: false,
-      classes: "mt-10",
-      buttons: [
-        {
-          text: "Back",
-          action: tour.back,
-          classes: "default-button",
-        },
-        {
-          text: "Next",
-          action: tour.next,
-          classes: "default-button px-4 py-2 rounded",
-        },
-      ],
-    });
-  
-    tour.addStep({
-      id: "export",
-      title: "Export Data",
-      text: "Use this feature to export data to PDF. Select specific pages from the table to export.",
-      attachTo: { element: "#export-record", on: "bottom" },
-      scrollTo: false,
-      classes: "mt-10",
-      buttons: [
-        {
-          text: "Back",
-          action: tour.back,
-          classes: "default-button",
-        },
-        {
-          text: "Next",
-          action: tour.next,
-          classes: "default-button px-4 py-2 rounded",
-        },
-      ],
-    });
-  
-    tour.addStep({
-      id: "table",
-      title: "Data Table",
-      text: "This table displays the main data for machine records.",
-      attachTo: { element: "#table-record", on: "top" },
-      scrollTo: false,
-      classes: "mb-10",
-      buttons: [
-        {
-          text: "Back",
-          action: tour.back,
-          classes: "default-button",
-        },
-        {
-          text: "Next",
-          action: tour.next,
-          classes: "default-button px-4 py-2 rounded",
-        },
-      ],
-    });
-  
-    tour.addStep({
-      id: "pagination",
-      title: "Pagination",
-      text: "Use the pagination controls to navigate between pages of data.",
-      attachTo: { element: "#pagination-record", on: "top" },
-      scrollTo: false,
-      buttons: [
-        {
-          text: "Back",
-          action: tour.back,
-          classes: "default-button",
-        },
-        {
-          text: "Finish",
-          action: tour.complete,
-          classes: "default-button px-4 py-2 rounded",
-        },
-      ],
-    });
-  
-    tour.start();
-  };  
+ 
 
   return (
     <div className="flex flex-col min-h-[32rem] justify-between">
@@ -296,7 +135,7 @@ export default function RecordTable() {
                 <Question
                   size={20}
                   weight="bold"
-                  onClick={startTour}
+                  onClick={startTourRecord}
                   className="cursor-pointer"
                 />
               </div>

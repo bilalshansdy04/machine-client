@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import io from 'socket.io-client';
 
-const socket = io('http://localhost:3000', {
+const SOCKET_URL = import.meta.env.VITE_URL_SOCKET;
+
+const socket = io(SOCKET_URL, {
   transports: ['websocket', 'polling']
 });
 
