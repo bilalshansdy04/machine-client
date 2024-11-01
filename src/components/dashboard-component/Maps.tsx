@@ -8,28 +8,48 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { MapsFetchData } from "../../utils/fetchData/maps-fetch-data.ts";
 import { blueIcon, redIcon, starIcon } from "../map-ui/MapIcons.ts";
 import "leaflet/dist/leaflet.css";
+import { io } from "socket.io-client";
+import {
+  MachineId,
+  MachineProfile,
+  MachineProductivity,
+} from "../../utils/interface/interface.ts";
+import { Question } from "@phosphor-icons/react";
+import { startTourMaps } from "@/utils/guide/guide-maps.ts";
 
 export default function Maps() {
-  const [apiData, setApiData] = useState([]);
-  const [productivityData, setProductivityData] = useState([]);
-  const [profileData, setProfileData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [idData, setIdData] = useState<MachineId[]>([]);
+  const [productivityData, setProductivityData] = useState<
+    MachineProductivity[]
+  >([]);
+  const [profileData, setProfileData] = useState<MachineProfile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchAndSetData = async () => {
-      const data = await MapsFetchData();
-      if (data) {
-        setApiData(data.apiData);
-        setProductivityData(data.productivityData);
-        setProfileData(data.profileData);
-      }
-      setIsLoading(false);
-    };
+    const SOCKET_URL = import.meta.env.VITE_URL_SOCKET;
+    const socket = io(SOCKET_URL, {
+      transports: ["websocket", "polling"],
+    });
 
-    fetchAndSetData();
+    socket.on("data_update", (newData) => {
+      console.log("Data received from server:", newData);
+      if (newData) {
+        setIdData(newData.id);
+        setProductivityData(newData.productivity);
+        setProfileData(newData.profile);
+        setLoading(false);
+        setIsLoading(false);
+      } else {
+        console.error("Data tidak ditemukan");
+      }
+    });
+
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   const getLatestOutputCapacity = (objectId: string) => {
@@ -117,15 +137,26 @@ export default function Maps() {
 
   const topOutputMachine = findTopOutputCapacityMachines();
 
+
   return (
     <div className="relative space-y-3">
       <div>
-        <h1 className="font-bold text-xl">Maps</h1>
-        <h2 className="font-normal text-lg text-slate-500">
+        <div className="flex gap-2 items-center">
+          <h1 className="font-bold text-xl p-1" id="title-maps">
+            Maps
+          </h1>
+          <Question
+            size={20}
+            weight="bold"
+            onClick={startTourMaps}
+            className="cursor-pointer"
+          />
+        </div>
+        <h2 className="font-normal text-lg text-slate-500" id="sub-title-maps">
           Machine Locations on Map
         </h2>
       </div>
-      <div>
+      <div id="maps">
         <MapContainer
           center={[-7.9697253, 112.611356]}
           maxZoom={18}
@@ -137,7 +168,7 @@ export default function Maps() {
         >
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           {!isLoading &&
-            apiData.map((machine) => {
+            idData.map((machine) => {
               const lat = parseFloat(machine.lat.replace(",", "."));
               const long = parseFloat(machine.long.replace(",", "."));
 

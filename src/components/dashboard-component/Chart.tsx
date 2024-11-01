@@ -18,100 +18,37 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
-import { ChartFetchData } from "../../utils/fetchData/chart-fetch-data.ts";
 import { Question } from "@phosphor-icons/react";
-import Shepherd from "shepherd.js";
-import "shepherd.js/dist/css/shepherd.css";
-import "../../style/shepherd-theme-custom.css";
+import { startTourChart } from "@/utils/guide/guide-chart";
+import { MachineProductivity } from "@/utils/interface/interface.ts";
+import { useEffect } from "react";
+import { io } from "socket.io-client";
 
 export default function Chart() {
-  const [data, setApiData] = React.useState<any[]>([]);
+  const [data, setApiData] = React.useState<MachineProductivity[]>([]);
   const [selectedObjectCode, setSelectedObjectCode] = React.useState("");
   const [selectedValue, setSelectedValue] = React.useState("outputcapacity");
 
-  React.useEffect(() => {
-    const fetchAndSetData = async () => {
-      const data = await ChartFetchData();
-      if (data) {
-        setApiData(data);
+  useEffect(() => {
+    const SOCKET_URL = import.meta.env.VITE_URL_SOCKET;
+    const socket = io(SOCKET_URL, {
+      transports: ["websocket", "polling"],
+    });
+
+    socket.on("data_update", (newData) => {
+      console.log("Data received from server:", newData);
+      if (newData && newData.productivity) {
+        console.log("Productivity data received:", newData.productivity);
+        setApiData(newData.productivity);
+      } else {
+        console.error("Data productivity tidak ditemukan");
       }
+    });
+
+    return () => {
+      socket.disconnect();
     };
-
-    fetchAndSetData();
   }, []);
-
-  // Shepherd initialization
-  const startTour = () => {
-    let tour = new Shepherd.Tour({
-      useModalOverlay: true,
-      defaultStepOptions: {
-        scrollTo: true,
-      },
-    });
-
-    // Step for Title
-    tour.addStep({
-      id: "title",
-      title: "Title",
-      text: "This title section highlights the chart displayed here.",
-      attachTo: { element: "#title-chart", on: "bottom" },
-      scrollTo: false,
-      classes: "title",
-      buttons: [
-        {
-          text: "Next",
-          action: tour.next,
-          classes: "default-button",
-        },
-      ],
-    });
-
-    // Step for Dropdown
-    tour.addStep({
-      id: "dropdown",
-      title: "Dropdown",
-      text: "Press this button to select an object code, and then choose whether to view the output capacity or output cost. The chart will be displayed after making a selection.",
-      attachTo: { element: "#dropdown", on: "left" },
-      scrollTo: false,
-      classes: "dropdown",
-      buttons: [
-        {
-          text: "Back",
-          action: tour.back,
-          classes: "default-button",
-        },
-        {
-          text: "Next",
-          action: tour.next,
-          classes: "default-button",
-        },
-      ],
-    });
-
-    // Step for Chart
-    tour.addStep({
-      id: "chart",
-      title: "Chart Display",
-      text: "This is the chart section. It will not be displayed until an object code is selected.",
-      attachTo: { element: "#chart", on: "top" },
-      scrollTo: false,
-      buttons: [
-        {
-          text: "Back",
-          action: tour.back,
-          classes: "default-button",
-        },
-        {
-          text: "Done",
-          action: tour.complete,
-          classes: "default-button",
-        },
-      ],
-    });
-
-    // Start the tour
-    tour.start();
-  };
 
   // Get unique object codes from data for dropdown
   const objectCodes = [...new Set(data.map((item) => item.objectcode))];
@@ -158,7 +95,7 @@ export default function Chart() {
             <Question
               size={20}
               weight="bold"
-              onClick={startTour}
+              onClick={startTourChart}
               className="cursor-pointer"
             />
           </div>

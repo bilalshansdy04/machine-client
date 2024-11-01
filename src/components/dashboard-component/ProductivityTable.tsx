@@ -7,12 +7,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Input } from "../ui/input.tsx";
+import { Button } from "../ui/button.tsx";
 
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 
-import { Input } from "../ui/input.tsx";
-import { Button } from "../ui/button.tsx";
+import io from "socket.io-client";
 
 import { grid } from "ldrs";
 
@@ -20,12 +21,10 @@ import { FilterDropdowns } from "./FilterDropdowns.tsx";
 
 import { MachineProductivity } from "../../utils/interface/interface.ts";
 import { exportTableToPDF } from "../../utils/convertToPDF.ts";
-import { ProductivityFetchData } from "../../utils/fetchData/productivity-fetch-data.ts";
+
 import { Question } from "@phosphor-icons/react";
 
-import Shepherd from "shepherd.js";
-import "shepherd.js/dist/css/shepherd.css";
-import "../../style/shepherd-theme-custom.css";
+import { startTourProductivity } from "@/utils/guide/guide-productivity.ts";
 
 grid.register();
 
@@ -63,19 +62,29 @@ export default function ProductivityTable() {
       ...prevFilters,
       [field]: value.includes("All") ? "" : value,
     }));
+    setCurrentPage(1);
   };
 
   useEffect(() => {
-    const fetchAndSetData = async () => {
-      setLoading(true);
-      const data = await ProductivityFetchData();
-      if (data) {
-        setApiData(data);
-      }
-      setLoading(false);
-    };
+    const SOCKET_URL = import.meta.env.VITE_URL_SOCKET;
+    const socket = io(SOCKET_URL, {
+      transports: ["websocket", "polling"],
+    });
 
-    fetchAndSetData();
+    socket.on("data_update", (newData) => {
+      console.log("Data received from server:", newData);
+      if (newData && newData.productivity) {
+        console.log("Productivity data received:", newData.productivity);
+        setApiData(newData.productivity);
+        setLoading(false);
+      } else {
+        console.error("Data productivity tidak ditemukan");
+      }
+    });
+
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   const uniqueValues = useMemo(() => {
@@ -101,34 +110,36 @@ export default function ProductivityTable() {
 
   const handleSearchSubmit = () => {
     setConfirmedSearchTerm(searchTerm);
-    setCurrentPage(1);
+    setCurrentPage(1); // Reset pagination ke halaman pertama setelah search diterapkan
   };
 
-  const filteredAndSearchedData = apiData.filter((productivity) => {
-    const dropdownFiltersMatch = Object.keys(selectedFilters).every((key) => {
-      const field = key as keyof MachineProductivity;
-      const filterValue = selectedFilters[field];
+  const filteredAndSearchedData = useMemo(() => {
+    return apiData.filter((productivity) => {
+      const dropdownFiltersMatch = Object.keys(selectedFilters).every((key) => {
+        const field = key as keyof MachineProductivity;
+        const filterValue = selectedFilters[field];
 
-      if (!filterValue || filterValue === "All") return true;
+        if (!filterValue || filterValue === "All") return true;
 
-      if (field === "outputcapacity") {
-        const capacityValue = parseFloat(productivity[field]);
-        return (
-          !isNaN(capacityValue) && capacityValue === parseFloat(filterValue)
-        );
-      }
+        if (field === "outputcapacity") {
+          const capacityValue = parseFloat(productivity[field]);
+          return (
+            !isNaN(capacityValue) && capacityValue === parseFloat(filterValue)
+          );
+        }
 
-      return productivity[field] === filterValue;
+        return productivity[field] === filterValue;
+      });
+
+      const searchInLower = confirmedSearchTerm.toLowerCase();
+      return (
+        dropdownFiltersMatch &&
+        Object.values(productivity).some((value) =>
+          value.toString().toLowerCase().includes(searchInLower)
+        )
+      );
     });
-
-    const searchInLower = confirmedSearchTerm.toLowerCase();
-    return (
-      dropdownFiltersMatch &&
-      Object.values(productivity).some((value) =>
-        value.toString().toLowerCase().includes(searchInLower)
-      )
-    );
-  });
+  }, [apiData, selectedFilters, confirmedSearchTerm]);
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -169,180 +180,6 @@ export default function ProductivityTable() {
     );
   };
 
-  const startTour = () => {
-    // Hentikan atau selesaikan tour jika sudah berjalan
-    if (Shepherd.activeTour) {
-      Shepherd.activeTour.complete();
-    }
-  
-    const tour: Shepherd.Tour = new Shepherd.Tour({
-      useModalOverlay: true,
-      defaultStepOptions: {
-        scrollTo: true,
-        cancelIcon: {
-          enabled: true,
-        },
-        buttons: [
-          {
-            text: 'Back',
-            action: () => tour.back(),
-            classes: 'default-button px-4 py-2 rounded',
-          },
-          {
-            text: 'Close',
-            action: () => tour.cancel(),
-            classes: 'default-button px-4 py-2 rounded',
-          },
-        ],
-      },
-    });
-  
-    tour.addStep({
-      id: 'title',
-      title: 'Table Title',
-      text: 'This is the title for the table.',
-      attachTo: { element: '#title-productivity', on: 'bottom' },
-      scrollTo: false,
-      classes: "mt-10",
-      buttons: [
-        {
-          text: 'Next',
-          action: tour.next,
-          classes: 'default-button px-4 py-2 rounded',
-        },
-      ],
-    });
-  
-    tour.addStep({
-      id: 'sub-title',
-      title: 'Table Overview',
-      text: 'This subtitle indicates that this table contains machine productivity data.',
-      attachTo: { element: '#sub-title-productivity', on: 'bottom' },
-      scrollTo: false,
-      classes: "mt-10",
-      buttons: [
-        {
-          text: "Back",
-          action: tour.back,
-          classes: "default-button",
-        },
-        {
-          text: 'Next',
-          action: tour.next,
-          classes: 'default-button px-4 py-2 rounded',
-        },
-      ],
-    });
-  
-    tour.addStep({
-      id: 'search',
-      title: 'Search',
-      text: `Use this search box to quickly find the data you're looking for.`,
-      attachTo: { element: '#search-productivity', on: 'bottom' },
-      scrollTo: false,
-      classes: "mt-10",
-      buttons: [
-        {
-          text: "Back",
-          action: tour.back,
-          classes: "default-button",
-        },
-        {
-          text: 'Next',
-          action: tour.next,
-          classes: 'default-button px-4 py-2 rounded',
-        },
-      ],
-    });
-  
-    tour.addStep({
-      id: 'export',
-      title: 'Export Data',
-      text: 'Use this feature to export data to PDF. Select specific pages from the table to export.',
-      attachTo: { element: '#export-productivity', on: 'bottom' },
-      scrollTo: false,
-      classes: "mt-10",
-      buttons: [
-        {
-          text: "Back",
-          action: tour.back,
-          classes: "default-button",
-        },
-        {
-          text: 'Next',
-          action: tour.next,
-          classes: 'default-button px-4 py-2 rounded',
-        },
-      ],
-    });
-  
-    tour.addStep({
-      id: 'filter-button',
-      title: 'Filter Button',
-      text: 'This button is used to filter the displayed data according to your selected criteria.',
-      attachTo: { element: '#filter-button', on: 'bottom' },
-      scrollTo: false,
-      classes: "mt-10",
-      buttons: [
-        {
-          text: "Back",
-          action: tour.back,
-          classes: "default-button",
-        },
-        {
-          text: 'Next',
-          action: tour.next,
-          classes: 'default-button px-4 py-2 rounded',
-        },
-      ],
-    });
-  
-    tour.addStep({
-      id: 'table',
-      title: 'Data Table',
-      text: 'This table displays the main data for machine productivity.',
-      attachTo: { element: '#table-productivity', on: 'top' },
-      scrollTo: false,
-      classes: 'mb-10',
-      buttons: [
-        {
-          text: "Back",
-          action: tour.back,
-          classes: "default-button",
-        },
-        {
-          text: 'Next',
-          action: tour.next,
-          classes: 'default-button px-4 py-2 rounded',
-        },
-      ],
-    });
-  
-    tour.addStep({
-      id: 'pagination',
-      title: 'Pagination',
-      text: 'Use the pagination controls to navigate between pages of data.',
-      attachTo: { element: '#pagination-productivity', on: 'top' },
-      scrollTo: false,
-      buttons: [
-        {
-          text: "Back",
-          action: tour.back,
-          classes: "default-button",
-        },
-        {
-          text: 'Finish',
-          action: tour.complete,
-          classes: 'default-button px-4 py-2 rounded',
-        },
-      ],
-    });
-  
-    tour.start();
-  };
-  
-  
-
   return (
     <div className="flex flex-col min-h-[29rem] justify-between">
       {loading || apiData.length === 0 ? (
@@ -361,7 +198,7 @@ export default function ProductivityTable() {
                   <Question
                     size={20}
                     weight="bold"
-                    onClick={startTour}
+                    onClick={startTourProductivity}
                     className="cursor-pointer"
                   />
                 </div>
@@ -503,33 +340,32 @@ export default function ProductivityTable() {
                 </TableHeader>
                 <TableBody>
                   {currentData.map((productivity, index) => (
-                    <TableRow key={productivity.id}>
+                    <TableRow key={index}>
                       <TableCell className="font-black">
                         {indexOfFirstItem + index + 1}
                       </TableCell>
-                      <TableCell>{productivity.objecttype.trim()}</TableCell>
-                      <TableCell>{productivity.objectid.trim()}</TableCell>
-                      <TableCell>{productivity.objectgroup.trim()}</TableCell>
-                      <TableCell>{productivity.objectcode.trim()}</TableCell>
-                      <TableCell>
-                        {parseFloat(productivity.outputcapacity).toString()}
-                      </TableCell>
-                      <TableCell>{productivity.outputuom.trim()}</TableCell>
-                      <TableCell>{productivity.outputtime.trim()}</TableCell>
-                      <TableCell>
-                        {parseFloat(productivity.outputcost).toString()}
-                      </TableCell>
+                      <TableCell>{productivity.objecttype}</TableCell>
+                      <TableCell>{productivity.objectid}</TableCell>
+                      <TableCell>{productivity.objectgroup}</TableCell>
+                      <TableCell>{productivity.objectcode}</TableCell>
+                      <TableCell>{productivity.outputcapacity}</TableCell>
+                      <TableCell>{productivity.outputuom}</TableCell>
+                      <TableCell>{productivity.outputtime}</TableCell>
+                      <TableCell>{productivity.outputcost}</TableCell>
                       <TableCell>{productivity.startdate}</TableCell>
                       <TableCell>{productivity.enddate}</TableCell>
-                      <TableCell>{productivity.objectstatus.trim()}</TableCell>
+                      <TableCell>{productivity.objectstatus}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
             </div>
           </div>
-          <div className="flex justify-center w-full" id="pagination-productivity">
-            <Stack spacing={2} mt={2}>
+          <div
+            className="flex justify-center w-full"
+            id="pagination-productivity"
+          >
+            <Stack spacing={2} className="items-center mt-2">
               <Pagination
                 count={totalPages}
                 page={currentPage}
@@ -544,16 +380,9 @@ export default function ProductivityTable() {
   );
 }
 
-// Helper function to get unique values for dropdowns
-const getUniqueValues = (
+function getUniqueValues(
   data: MachineProductivity[],
   field: keyof MachineProductivity
-): string[] => {
-  const values = data.map((item) => {
-    if (field === "outputcapacity") return item.outputcapacity || "0";
-    if (field === "startdate") return item.startdate || "";
-    return item[field]?.toString() || "";
-  });
-
-  return Array.from(new Set(values)).filter((val) => val !== "");
-};
+) {
+  return [...new Set(data.map((item) => item[field]))];
+}
