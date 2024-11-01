@@ -11,26 +11,30 @@ import {
 import { blueIcon, redIcon, starIcon } from "../map-ui/MapIcons.ts";
 import "leaflet/dist/leaflet.css";
 import { io } from "socket.io-client";
-import { MachineId, MachineProfile, MachineProductivity } from "../../utils/interface/interface.ts";
+import {
+  MachineId,
+  MachineProfile,
+  MachineProductivity,
+} from "../../utils/interface/interface.ts";
 import { Question } from "@phosphor-icons/react";
-import Shepherd from "shepherd.js";
-import "shepherd.js/dist/css/shepherd.css";
-import "../../style/shepherd-theme-custom.css";
+import { startTourMaps } from "@/utils/guide/guide-maps.ts";
 
 export default function Maps() {
   const [loading, setLoading] = useState(true);
-  const [idData, setIdData] = useState<MachineId[]>([]);  
-  const [productivityData, setProductivityData] = useState<MachineProductivity[]>([]);
+  const [idData, setIdData] = useState<MachineId[]>([]);
+  const [productivityData, setProductivityData] = useState<
+    MachineProductivity[]
+  >([]);
   const [profileData, setProfileData] = useState<MachineProfile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const SOCKET_URL = import.meta.env.VITE_URL_SOCKET;
     const socket = io(SOCKET_URL, {
-      transports: ['websocket', 'polling']
+      transports: ["websocket", "polling"],
     });
 
-    socket.on('data_update', (newData) => {
+    socket.on("data_update", (newData) => {
       console.log("Data received from server:", newData);
       if (newData) {
         setIdData(newData.id);
@@ -133,107 +137,21 @@ export default function Maps() {
 
   const topOutputMachine = findTopOutputCapacityMachines();
 
-  const startTourMaps = () => {
-    if (Shepherd.activeTour) {
-      Shepherd.activeTour.complete();
-    }
-  
-    const tour: Shepherd.Tour = new Shepherd.Tour({
-      useModalOverlay: true,
-      defaultStepOptions: {
-        scrollTo: true,
-        cancelIcon: {
-          enabled: true,
-        },
-        buttons: [
-          {
-            text: "Back",
-            action: () => tour.back(),
-            classes: "default-button px-4 py-2 rounded",
-          },
-          {
-            text: "Close",
-            action: () => tour.cancel(),
-            classes: "default-button px-4 py-2 rounded",
-          },
-        ],
-      },
-    });
-  
-    tour.addStep({
-      id: "title",
-      title: "Map Title",
-      text: "This is the main title for the map, giving an overview of machine locations.",
-      attachTo: { element: "#title-maps", on: "bottom" },
-      scrollTo: false,
-      classes: "mt-10",
-      buttons: [
-        {
-          text: "Next",
-          action: tour.next,
-          classes: "default-button px-4 py-2 rounded",
-        },
-      ],
-    });
-  
-    tour.addStep({
-      id: "sub-title",
-      title: "Map Subtitle",
-      text: "Here, you can see a brief description and summary of the map view, outlining the machine distribution.",
-      attachTo: { element: "#sub-title-maps", on: "bottom" },
-      scrollTo: false,
-      classes: "mt-10",
-      buttons: [
-        {
-          text: "Back",
-          action: tour.back,
-          classes: "default-button",
-        },
-        {
-          text: "Next",
-          action: tour.next,
-          classes: "default-button px-4 py-2 rounded",
-        },
-      ],
-    });
-  
-    tour.addStep({
-      id: "maps",
-      title: "Machine Map and Distribution",
-      text: `This map displays the machine locations marked by colored markers. Blue markers indicate machines with above-average output capacity, while red markers represent those with below-average capacity. Markers with stars highlight machines with the highest output capacity. You can click on any marker to see detailed information about the machine's specifications and performance.`,
-      attachTo: { element: "#maps", on: "bottom" },
-      scrollTo: false,
-      classes: "mt-10",
-      buttons: [
-        {
-          text: "Back",
-          action: tour.back,
-          classes: "default-button",
-        },
-        {
-          text: "Next",
-          action: tour.next,
-          classes: "default-button px-4 py-2 rounded",
-        },
-      ],
-    });
-  };
-  
 
   return (
     <div className="relative space-y-3">
       <div>
-      <div className="flex gap-2 items-center">
-            <h1 className="font-bold text-xl p-1" id="title-maps">
-              Maps
-            </h1>
-            <Question
-              size={20}
-              weight="bold"
-              onClick={startTourMaps}
-              className="cursor-pointer"
-            />
-          </div>
+        <div className="flex gap-2 items-center">
+          <h1 className="font-bold text-xl p-1" id="title-maps">
+            Maps
+          </h1>
+          <Question
+            size={20}
+            weight="bold"
+            onClick={startTourMaps}
+            className="cursor-pointer"
+          />
+        </div>
         <h2 className="font-normal text-lg text-slate-500" id="sub-title-maps">
           Machine Locations on Map
         </h2>

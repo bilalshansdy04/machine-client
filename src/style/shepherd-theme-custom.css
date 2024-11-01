@@ -31,3 +31,8 @@
 .table {
   margin-bottom: 50px;
 }
+
+/* Maps */
+.z{
+  z-index: 100;
+}

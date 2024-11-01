@@ -50,7 +50,7 @@ export const startTourMaps = () => {
   tour.addStep({
     id: "maps",
     title: "Machine Map and Distribution",
-    text: `This map displays the machine locations marked by colored markers. Blue markers indicate machines with above-average output capacity, while red markers represent those with below-average capacity. Markers with stars highlight machines with the highest output capacity. You can click on any marker to see detailed information about the machine's specifications and performance.`,
+    text: `This map displays the machine locations marked by colored markers. Blue markers indicate machines with above-average output capacity, while red markers represent those with below-average capacity. Markers with stars highlight machines with the highest output capacity. You can click on any marker to see detailed information about the machine.`,
     attachTo: { element: "#maps", on: "bottom" },
     scrollTo: false,
     classes: "mt-10",
@@ -61,10 +61,12 @@ export const startTourMaps = () => {
         classes: "default-button",
       },
       {
-        text: "Next",
-        action: tour.next,
+        text: "Finish",
+        action: tour.complete,
         classes: "default-button px-4 py-2 rounded",
       },
     ],
   });
+
+  tour.start();
 };
