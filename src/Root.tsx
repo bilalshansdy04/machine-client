@@ -2,7 +2,6 @@ import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { useEffect } from "react";
-import NavbarGuide from "./NavbarGuide";
 
 const Root = () => {
   const location = useLocation();
@@ -29,7 +28,7 @@ const Root = () => {
         className={`${
           location.pathname === "/guide"
             ? "px-0 pt-0 pb-0 bg-white"
-            : "px-36 pt-10 pb-20 bg-[#eff3f8]"
+            : "px-36 pt-10 pb-20 bg-Primary"
         }`}
       >
         <Outlet />

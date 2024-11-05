@@ -54,7 +54,7 @@ export const FilterDropdowns: React.FC<FilterDropdownsProps> = ({
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
-              className="bg-flamePhoenix outline-flamePhoenix text-white hover:bg-emberPhoenix hover:text-white"
+              className="bg-Tertiary outline-Tertiary text-white hover:bg-HoverTertiary hover:text-white"
             >
               Filter by{" "}
               {

@@ -155,7 +155,7 @@ export default function RecordTable() {
               />
               <Button
                 onClick={handleSearchSubmit}
-                className="bg-oceanKnight text-white hover:bg-abyssKnight"
+                className="bg-Quaternary text-white hover:bg-abyssKnight"
               >
                 Search
               </Button>
@@ -228,7 +228,7 @@ export default function RecordTable() {
                     "record"
                   )
                 }
-                className="bg-oceanKnight text-white hover:bg-abyssKnight"
+                className="bg-Quaternary text-white hover:bg-abyssKnight"
               >
                 Export to PDF
               </Button>
@@ -237,7 +237,7 @@ export default function RecordTable() {
           <div>
             {loading || apiData.length === 0 ? (
               <div className="w-full h-full flex items-center justify-center mt-36">
-                <l-grid size="150" speed="1.5" color="#f39512"></l-grid>
+                <l-grid size="150" speed="1.5" color="#0b60b0"></l-grid>
               </div>
             ) : (
               <div id="table-record">

@@ -10,7 +10,7 @@ export default function Dashboard() {
     <div className="flex flex-col gap-10">
       <section>
         <div
-          className="w-full h-[33rem] rounded-xl bg-white px-10 pt-10 pb-16 shadow scroll-mt-20"
+          className="w-full h-[33rem] rounded-xl bg-Secondary px-10 pt-10 pb-16 shadow scroll-mt-20"
           id="chart"
         >
           <Chart />
@@ -18,7 +18,7 @@ export default function Dashboard() {
       </section>
       <section>
         <div
-          className="w-full h-[33rem] rounded-xl bg-white px-10 pt-10 pb-16 shadow scroll-mt-36"
+          className="w-full h-[33rem] rounded-xl bg-Secondary px-10 pt-10 pb-16 shadow scroll-mt-36"
           id="productivity"
         >
           <ProductivityTable />
@@ -26,7 +26,7 @@ export default function Dashboard() {
       </section>
       <section>
         <div
-          className="w-full h-[37rem] rounded-xl bg-white px-10 pt-10 pb-16 shadow scroll-mt-36"
+          className="w-full h-[37rem] rounded-xl bg-Secondary px-10 pt-10 pb-16 shadow scroll-mt-36"
           id="record"
         >
           <RecordTable />
@@ -34,7 +34,7 @@ export default function Dashboard() {
       </section>
       <section>
         <div
-          className="w-full h-[34rem] rounded-xl bg-white px-10 pt-10 pb-16 shadow scroll-mt-28"
+          className="w-full h-[34rem] rounded-xl bg-Secondary px-10 pt-10 pb-16 shadow scroll-mt-28"
           id="maps"
         >
           <Maps />
@@ -43,7 +43,7 @@ export default function Dashboard() {
       <div className="fixed bottom-10 right-10">
         <Link to="/guide">
           <div className="relative group">
-            <div className="bg-flamePhoenix text-white rounded-full w-12 h-12 flex items-center justify-center transition-all duration-300 group-hover:w-32 hover:rounded-full shadow-lg overflow-hidden">
+            <div className="bg-Tertiary text-Secondary rounded-full w-12 h-12 flex items-center justify-center transition-all duration-300 group-hover:w-32 hover:rounded-full shadow-lg overflow-hidden">
               <Info 
                 size={32}
                 className="transition-transform duration-300 group-hover:mr-2"

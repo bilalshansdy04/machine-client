@@ -5,6 +5,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Root from "./Root"; 
 import DataTable from "./pages/DataTable";
+import Guide from "./pages/Guide";
 
 const router = createBrowserRouter([
   {
@@ -14,6 +15,10 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <Dashboard />,
+      },
+      {
+        path: "/guide",
+        element: <Guide />,
       },
       {
         path: "/data",

@@ -184,7 +184,7 @@ export default function ProductivityTable() {
     <div className="flex flex-col min-h-[29rem] justify-between">
       {loading || apiData.length === 0 ? (
         <div className="w-full h-full flex items-center justify-center mt-36">
-          <l-grid size="150" speed="1.5" color="#f39512"></l-grid>
+          <l-grid size="150" speed="1.5" color="#0b60b0"></l-grid>
         </div>
       ) : (
         <>
@@ -222,7 +222,7 @@ export default function ProductivityTable() {
                 <Button
                   type="button"
                   onClick={handleSearchSubmit}
-                  className="bg-oceanKnight text-white hover:bg-abyssKnight"
+                  className="bg-Quaternary text-white hover:bg-abyssKnight"
                 >
                   <svg
                     fill="none"
@@ -306,7 +306,7 @@ export default function ProductivityTable() {
                       "productivity"
                     )
                   }
-                  className="bg-oceanKnight text-white hover:bg-abyssKnight"
+                  className="bg-Quaternary text-white hover:bg-abyssKnight"
                 >
                   Export to PDF
                 </Button>
