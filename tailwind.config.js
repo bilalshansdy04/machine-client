@@ -22,10 +22,16 @@ module.exports = {
         sans: ['"Kanit", sans-serif'],
       },
       colors: {
-        flamePhoenix: '#f39512', 
-        emberPhoenix: '#d27f0f',  
-        oceanKnight: '#385878',  
-        abyssKnight: '#2d475f',
+        Primary:  '#a5d8e5',
+        Secondary : '#e3f6f5 ',
+        Tertiary  : '#0b60b0',
+        Quaternary  : '#394867',
+
+        HoverPrimary:  '#6ab5c8',
+        HoverSecondary : '#b9e3e2',
+        HoverTertiary  : '#0a549d',
+        HoverQuaternary  : '#2f3b56',
+
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

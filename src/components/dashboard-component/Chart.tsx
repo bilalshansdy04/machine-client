@@ -80,7 +80,7 @@ export default function Chart() {
         selectedValue === "outputcapacity"
           ? "Output Capacity (TON)"
           : "Output Cost (IDR)",
-      color: "#385878",
+      color: "#394867",
     },
   };
 
@@ -108,7 +108,7 @@ export default function Chart() {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
-                className="bg-flamePhoenix text-white hover:bg-flamePhoenix"
+                className="bg-Tertiary text-white hover:bg-Tertiary"
               >
                 {selectedObjectCode ? selectedObjectCode : "Choose Object Code"}
               </Button>
@@ -133,7 +133,7 @@ export default function Chart() {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
-                className="bg-flamePhoenix text-white hover:bg-emberPhoenix"
+                className="bg-Tertiary text-white hover:bg-HoverTertiary"
               >
                 {selectedValue === "outputcapacity"
                   ? "Output Capacity"
