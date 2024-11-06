@@ -36,9 +36,7 @@ export default function Chart() {
     });
 
     socket.on("data_update", (newData) => {
-      console.log("Data received from server:", newData);
       if (newData && newData.productivity) {
-        console.log("Productivity data received:", newData.productivity);
         setApiData(newData.productivity);
       } else {
         console.error("Data productivity tidak ditemukan");
@@ -50,10 +48,8 @@ export default function Chart() {
     };
   }, []);
 
-  // Get unique object codes from data for dropdown
   const objectCodes = [...new Set(data.map((item) => item.objectcode))];
 
-  // Filter data based on selected object code
   const filteredData = data
     .filter(
       (item) =>
@@ -108,7 +104,7 @@ export default function Chart() {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
-                className="bg-Tertiary text-white hover:bg-Tertiary"
+                className="bg-Tertiary text-white hover:bg-HoverTertiary hover:text-white"
               >
                 {selectedObjectCode ? selectedObjectCode : "Choose Object Code"}
               </Button>
@@ -133,7 +129,7 @@ export default function Chart() {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
-                className="bg-Tertiary text-white hover:bg-HoverTertiary"
+                className="bg-Tertiary text-white hover:bg-HoverTertiary hover:text-white"
               >
                 {selectedValue === "outputcapacity"
                   ? "Output Capacity"

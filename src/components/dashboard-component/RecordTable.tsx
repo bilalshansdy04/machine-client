@@ -50,9 +50,7 @@ export default function RecordTable() {
     });
 
     socket.on('data_update', (newData) => {
-      console.log("Data received from server:", newData);
       if (newData && newData.record) {
-        console.log("Productivity data received:", newData.record);
         setApiData(newData.record);
         setLoading(false);
       } else {

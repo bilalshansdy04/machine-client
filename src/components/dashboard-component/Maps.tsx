@@ -20,7 +20,7 @@ import { Question } from "@phosphor-icons/react";
 import { startTourMaps } from "@/utils/guide/guide-maps.ts";
 
 export default function Maps() {
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
   const [idData, setIdData] = useState<MachineId[]>([]);
   const [productivityData, setProductivityData] = useState<
     MachineProductivity[]
@@ -35,7 +35,6 @@ export default function Maps() {
     });
 
     socket.on("data_update", (newData) => {
-      console.log("Data received from server:", newData);
       if (newData) {
         setIdData(newData.id);
         setProductivityData(newData.productivity);
@@ -72,7 +71,7 @@ export default function Maps() {
       return [];
     }
 
-    const latestCapacities = {};
+    const latestCapacities: { [key: string]: number } = {};
 
     productivityData.forEach((data) => {
       const objectId = data.objectid;
