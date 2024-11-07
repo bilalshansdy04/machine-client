@@ -46,7 +46,7 @@ export default function RecordTable() {
   useEffect(() => {
     const SOCKET_URL = import.meta.env.VITE_URL_SOCKET;
     const socket = io(SOCKET_URL, {
-      transports: ['websocket', 'polling']
+      transports: ["websocket"]
     });
 
     socket.on('data_update', (newData) => {
@@ -99,6 +99,7 @@ export default function RecordTable() {
       )
       .sort((a, b) => a.recorddate.localeCompare(b.recorddate));
   }, [apiData, confirmedSearchTerm]);
+  
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -272,7 +273,7 @@ export default function RecordTable() {
                         <TableCell>{record.recordnotes}</TableCell>
                         <TableCell>{record.recordstatus}</TableCell>
                       </TableRow>
-                    ))}
+                    ))};;
                   </TableBody>
                 </Table>
               </div>

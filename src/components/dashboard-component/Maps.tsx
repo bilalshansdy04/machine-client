@@ -31,7 +31,7 @@ export default function Maps() {
   useEffect(() => {
     const SOCKET_URL = import.meta.env.VITE_URL_SOCKET;
     const socket = io(SOCKET_URL, {
-      transports: ["websocket", "polling"],
+      transports: ["websocket"],
     });
 
     socket.on("data_update", (newData) => {
@@ -98,8 +98,10 @@ export default function Maps() {
     return topMachines;
   };
 
-  const calculateAverageCapacity = () => {
-    const latestCapacities: { [key: string]: number } = {};
+  const calculateAverageCapacity = (_objectId: string) => {
+    const latestCapacities: {
+      [key: string]: { outputcapacity: number; enddate: string };
+    } = {};
 
     productivityData.forEach((data) => {
       const { objectid, outputcapacity, enddate } = data;
@@ -116,7 +118,7 @@ export default function Maps() {
     });
 
     const totalCapacity = Object.values(latestCapacities).reduce(
-      (sum, record) => sum + record.outputcapacity,
+      (sum, record) => sum + record.outputcapacity, 
       0
     );
     return Object.keys(latestCapacities).length > 0
@@ -124,18 +126,7 @@ export default function Maps() {
       : 0;
   };
 
-  const topOutputCapacity = Math.max(
-    ...productivityData.map((data) => parseFloat(data.outputcapacity) || 0)
-  );
-  // console.log("Top Output Capacity:", topOutputCapacity);
-
-  const topMachines = productivityData.filter(
-    (machine) => parseFloat(machine.outputcapacity) === topOutputCapacity
-  );
-  // console.log("Top Machines:", topMachines);
-
   const topOutputMachine = findTopOutputCapacityMachines();
-
 
   return (
     <div className="relative space-y-3">

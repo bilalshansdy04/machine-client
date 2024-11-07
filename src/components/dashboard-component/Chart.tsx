@@ -32,7 +32,7 @@ export default function Chart() {
   useEffect(() => {
     const SOCKET_URL = import.meta.env.VITE_URL_SOCKET;
     const socket = io(SOCKET_URL, {
-      transports: ["websocket", "polling"],
+      transports: ["websocket"],
     });
 
     socket.on("data_update", (newData) => {

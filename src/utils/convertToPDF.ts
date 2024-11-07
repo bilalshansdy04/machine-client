@@ -1,7 +1,6 @@
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import { MachineProductivity } from "../pages/Dashboard.tsx";
-import { MachineRecord } from "../components/dashboard-component/RecordTable.tsx";
+import { MachineProductivity, MachineRecord } from "../utils/interface/interface.ts";
 
 type ExportType = "productivity" | "record";
 
