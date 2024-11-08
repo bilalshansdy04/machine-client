@@ -20,37 +20,17 @@ import {
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import { Question } from "@phosphor-icons/react";
 import { startTourChart } from "@/utils/guide/guide-chart";
-import { MachineProductivity } from "@/utils/interface/interface.ts";
-import { useEffect } from "react";
-import { io } from "socket.io-client";
+import useWebSocket from "../../hooks/useWebSocket.ts";
 
 export default function Chart() {
-  const [data, setApiData] = React.useState<MachineProductivity[]>([]);
+  const { productivityData } = useWebSocket(import.meta.env.VITE_URL_SOCKET);
   const [selectedObjectCode, setSelectedObjectCode] = React.useState("");
   const [selectedValue, setSelectedValue] = React.useState("outputcapacity");
 
-  useEffect(() => {
-    const SOCKET_URL = import.meta.env.VITE_URL_SOCKET;
-    const socket = io(SOCKET_URL, {
-      transports: ["websocket"],
-    });
 
-    socket.on("data_update", (newData) => {
-      if (newData && newData.productivity) {
-        setApiData(newData.productivity);
-      } else {
-        console.error("Data productivity tidak ditemukan");
-      }
-    });
+  const objectCodes = [...new Set(productivityData.map((item) => item.objectcode))];
 
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
-
-  const objectCodes = [...new Set(data.map((item) => item.objectcode))];
-
-  const filteredData = data
+  const filteredData = productivityData
     .filter(
       (item) =>
         selectedObjectCode === "" || item.objectcode === selectedObjectCode

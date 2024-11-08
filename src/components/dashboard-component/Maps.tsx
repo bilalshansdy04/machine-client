@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import {
   Dialog,
@@ -10,46 +9,15 @@ import {
 } from "@/components/ui/dialog";
 import { blueIcon, redIcon, starIcon } from "../map-ui/MapIcons.ts";
 import "leaflet/dist/leaflet.css";
-import { io } from "socket.io-client";
-import {
-  MachineId,
-  MachineProfile,
-  MachineProductivity,
-} from "../../utils/interface/interface.ts";
 import { Question } from "@phosphor-icons/react";
 import { startTourMaps } from "@/utils/guide/guide-maps.ts";
+import useWebSocket from "../../hooks/useWebSocket.ts";
 
 export default function Maps() {
-  const [_loading, setLoading] = useState(true);
-  const [idData, setIdData] = useState<MachineId[]>([]);
-  const [productivityData, setProductivityData] = useState<
-    MachineProductivity[]
-  >([]);
-  const [profileData, setProfileData] = useState<MachineProfile[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { idData, loading } = useWebSocket(import.meta.env.VITE_URL_SOCKET);
+  const { productivityData } = useWebSocket(import.meta.env.VITE_URL_SOCKET);
+  const { profileData } = useWebSocket(import.meta.env.VITE_URL_SOCKET);
 
-  useEffect(() => {
-    const SOCKET_URL = import.meta.env.VITE_URL_SOCKET;
-    const socket = io(SOCKET_URL, {
-      transports: ["websocket"],
-    });
-
-    socket.on("data_update", (newData) => {
-      if (newData) {
-        setIdData(newData.id);
-        setProductivityData(newData.productivity);
-        setProfileData(newData.profile);
-        setLoading(false);
-        setIsLoading(false);
-      } else {
-        console.error("Data tidak ditemukan");
-      }
-    });
-
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
 
   const getLatestOutputCapacity = (objectId: string) => {
     const relevantData = productivityData
@@ -157,7 +125,7 @@ export default function Maps() {
           style={{ width: "100%", height: "25rem", zIndex: "10" }}
         >
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-          {!isLoading &&
+          {!loading &&
             idData.map((machine) => {
               const lat = parseFloat(machine.lat.replace(",", "."));
               const long = parseFloat(machine.long.replace(",", "."));

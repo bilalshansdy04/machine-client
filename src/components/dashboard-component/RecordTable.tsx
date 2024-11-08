@@ -17,20 +17,18 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 
 import { exportTableToPDF } from "../../utils/convertToPDF.ts";
-import { MachineRecord } from "../../utils/interface/interface.ts";
 
 import { Question } from "@phosphor-icons/react";
 
-import io from "socket.io-client";
-
 import { startTourRecord } from "@/utils/guide/guide-record.ts";
+
+import useWebSocket from "../../hooks/useWebSocket.ts";
 
 grid.register();
 
 
 export default function RecordTable() {
-  const [apiData, setApiData] = useState<MachineRecord[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { recordData, loading } = useWebSocket(import.meta.env.VITE_URL_SOCKET);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [confirmedSearchTerm, setConfirmedSearchTerm] = useState("");
@@ -42,26 +40,6 @@ export default function RecordTable() {
   const [isFocusedEndPage, setIsFocusedEndPage] = useState(false);
 
   const itemsPerPage = 3;
-
-  useEffect(() => {
-    const SOCKET_URL = import.meta.env.VITE_URL_SOCKET;
-    const socket = io(SOCKET_URL, {
-      transports: ["websocket"]
-    });
-
-    socket.on('data_update', (newData) => {
-      if (newData && newData.record) {
-        setApiData(newData.record);
-        setLoading(false);
-      } else {
-        console.error("Data productivity tidak ditemukan");
-      }
-    });
-
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
 
   const handleSearchChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,14 +69,14 @@ export default function RecordTable() {
 
   const filteredAndSearchedData = useMemo(() => {
     const searchInLower = confirmedSearchTerm.toLowerCase();
-    return apiData
+    return recordData
       .filter((record) =>
         Object.values(record).some((value) =>
           String(value).toLowerCase().includes(searchInLower)
         )
       )
       .sort((a, b) => a.recorddate.localeCompare(b.recorddate));
-  }, [apiData, confirmedSearchTerm]);
+  }, [recordData, confirmedSearchTerm]);
   
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -234,7 +212,7 @@ export default function RecordTable() {
             </div>
           </div>
           <div>
-            {loading || apiData.length === 0 ? (
+            {loading || recordData.length === 0 ? (
               <div className="w-full h-full flex items-center justify-center mt-36">
                 <l-grid size="150" speed="1.5" color="#0b60b0"></l-grid>
               </div>
@@ -281,7 +259,7 @@ export default function RecordTable() {
           </div>
         </div>
       </div>
-      {!loading && apiData.length > 0 && (
+      {!loading && recordData.length > 0 && (
         <div className="flex justify-center w-full" id="pagination-record">
           <Stack spacing={2} mt={2}>
             <Pagination

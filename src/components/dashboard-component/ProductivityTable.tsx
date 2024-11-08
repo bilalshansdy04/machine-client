@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from "react";
-import io from "socket.io-client";
+import { useState,  useMemo } from "react";
+import useWebSocket from "../../hooks/useWebSocket.ts";
 import { SearchBar } from "../productivity-component/SearchBar";
 import { ConvertToPDFButton } from "../productivity-component/ConvertToPDFButton";
 import ProductivityTableDisplay from "../productivity-component/ProductivityTableDisplay";
@@ -14,49 +14,30 @@ grid.register();
 
 export default function ProductivityTable() {
   const [currentPage, setCurrentPage] = useState(1);
-  const [apiData, setApiData] = useState<MachineProductivity[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { productivityData, loading } = useWebSocket(import.meta.env.VITE_URL_SOCKET);
   const itemsPerPage = 3;
-  const [searchTerm, setSearchTerm] = useState("");
   const [confirmedSearchTerm, setConfirmedSearchTerm] = useState("");
   const [selectedFilters, setSelectedFilters] = useState<
     Partial<Record<keyof MachineProductivity, string>>
   >({});
 
-  useEffect(() => {
-    const socket = io(import.meta.env.VITE_URL_SOCKET, {
-      transports: ["websocket"],
-    });
-    socket.on("data_update", (newData) => {
-      if (newData && newData.productivity) {
-        setApiData(newData.productivity);
-        setLoading(false);
-      } else {
-        console.error("Data productivity tidak ditemukan");
-      }
-    });
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
-
   const uniqueValues = useMemo(
     () => ({
-      objecttype: ["All Types", ...getUniqueValues(apiData, "objecttype")],
-      objectid: ["All IDs", ...getUniqueValues(apiData, "objectid")],
-      objectgroup: ["All Groups", ...getUniqueValues(apiData, "objectgroup")],
-      objectcode: ["All Codes", ...getUniqueValues(apiData, "objectcode")],
+      objecttype: ["All Types", ...getUniqueValues(productivityData, "objecttype")],
+      objectid: ["All IDs", ...getUniqueValues(productivityData, "objectid")],
+      objectgroup: ["All Groups", ...getUniqueValues(productivityData, "objectgroup")],
+      objectcode: ["All Codes", ...getUniqueValues(productivityData, "objectcode")],
       outputcapacity: [
         "All Capacities",
-        ...getUniqueValues(apiData, "outputcapacity"),
+        ...getUniqueValues(productivityData, "outputcapacity"),
       ],
-      startdate: ["All Dates", ...getUniqueValues(apiData, "startdate")],
+      startdate: ["All Dates", ...getUniqueValues(productivityData, "startdate")],
     }),
-    [apiData]
+    [productivityData]
   );
 
   const filteredAndSearchedData = useMemo(() => {
-    return apiData.filter((productivity) => {
+    return productivityData.filter((productivity) => {
       const dropdownFiltersMatch = Object.keys(selectedFilters).every((key) => {
         const field = key as keyof MachineProductivity;
         const filterValue = selectedFilters[field];
@@ -81,7 +62,7 @@ export default function ProductivityTable() {
         )
       );
     });
-  }, [apiData, selectedFilters, confirmedSearchTerm]);
+  }, [productivityData, selectedFilters, confirmedSearchTerm]);
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -97,7 +78,7 @@ export default function ProductivityTable() {
 
   return (
     <div className="flex flex-col min-h-[29rem] justify-between">
-      {loading || apiData.length === 0 ? (
+      {loading || productivityData.length === 0 ? (
         <div className="w-full h-full flex items-center justify-center mt-36">
           <l-grid size="150" speed="1.5" color="#0b60b0"></l-grid>
         </div>
@@ -146,7 +127,7 @@ export default function ProductivityTable() {
               <Pagination
                 count={Math.ceil(filteredAndSearchedData.length / itemsPerPage)} // Dynamic count based on filtered data
                 page={currentPage}
-                onChange={(e, page) => setCurrentPage(page)}
+                onChange={(_e, page) => setCurrentPage(page)}
                 shape="rounded"
               />
             </Stack>
