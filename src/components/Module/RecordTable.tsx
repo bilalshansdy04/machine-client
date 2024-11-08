@@ -1,11 +1,11 @@
 import { useState, useMemo, useCallback } from "react";
-import Title from "../Record/Title";
-import Search from "../Record/Search";
-import Export from "../Record/Export";
-import RecordTableDisplay from "../Record/RecordTableDisplay";
+import Title from "./Record/Title.tsx";
+import Search from "./Record/Search.tsx";
+import Export from "./Record/Export.tsx";
+import RecordTableDisplay from "./Record/RecordTableDisplay.tsx";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
-import useWebSocket from "../../../utils/useWebSocket.ts";
+import useWebSocket from "../../utils/useWebSocket.ts";
 
 export default function RecordTable() {
   const { recordData, loading } = useWebSocket(import.meta.env.VITE_URL_SOCKET);
@@ -65,15 +65,17 @@ export default function RecordTable() {
           <div className="space-y-5">
             <div className="flex justify-between">
               <Title />
-              <Search
-                searchTerm={searchTerm}
-                onSearchChange={handleSearchChange}
-                onSearchSubmit={handleSearchSubmit}
-              />
-              <Export
-                data={filteredAndSearchedData}
-                itemsPerPage={itemsPerPage}
-              />
+              <div className="space-x-5 flex items-center justify-center h-full">
+                <Search
+                  searchTerm={searchTerm}
+                  onSearchChange={handleSearchChange}
+                  onSearchSubmit={handleSearchSubmit}
+                />
+                <Export
+                  data={filteredAndSearchedData}
+                  itemsPerPage={itemsPerPage}
+                />
+              </div>
             </div>
 
             <RecordTableDisplay

@@ -1,15 +1,15 @@
 import { useState, useMemo } from "react";
-import useWebSocket from "../../../utils/useWebSocket.ts";
-import { SearchBar } from "../Productivity/SearchBar.tsx";
-import { ConvertToPDFButton } from "../Productivity/ConvertToPDFButton.tsx";
-import ProductivityTableDisplay from "../Productivity/ProductivityTableDisplay.tsx";
-import { FilterDropdowns } from "../Productivity/FilterDropdowns.tsx";
+import useWebSocket from "../../utils/useWebSocket.ts";
+import { SearchBar } from "./Productivity/SearchBar.tsx";
+import { ConvertToPDFButton } from "./Productivity/ConvertToPDFButton.tsx";
+import ProductivityTableDisplay from "./Productivity/ProductivityTableDisplay.tsx";
+import { FilterDropdowns } from "./Productivity/FilterDropdowns.tsx";
 import { MachineProductivity } from "@/utils/interface/interface";
 import { fieldLabels, getUniqueValues } from "@/utils/helpers";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { grid } from "ldrs";
-import Title from "../Productivity/Title.tsx";
+import Title from "./Productivity/Title.tsx";
 
 grid.register();
 

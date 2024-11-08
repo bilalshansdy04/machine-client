@@ -1,9 +1,9 @@
 // Chart.tsx
 import * as React from "react";
-import useWebSocket from "../../../utils/useWebSocket.ts";
-import Title from "../Chart/Title";
-import Dropdowns from "../Chart/Dropdowns";
-import ChartDisplay from "../Chart/ChartDisplay";
+import useWebSocket from "../../utils/useWebSocket.ts";
+import Title from "./Chart/Title.tsx";
+import Dropdowns from "./Chart/Dropdowns.tsx";
+import ChartDisplay from "./Chart/ChartDisplay.tsx";
 
 export default function Chart() {
   const { productivityData } = useWebSocket(import.meta.env.VITE_URL_SOCKET);

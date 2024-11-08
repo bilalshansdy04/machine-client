@@ -1,7 +1,7 @@
-import Chart from "@/components/Module/Dashboard/Chart";
-import Maps from "@/components/Module/Dashboard/Maps";
-import ProductivityTable from "@/components/Module/Dashboard/ProductivityTable";
-import RecordTable from "@/components/Module/Dashboard/RecordTable";
+import Chart from "@/components/Module/Chart";
+import Maps from "@/components/Module/Maps";
+import ProductivityTable from "@/components/Module/ProductivityTable";
+import RecordTable from "@/components/Module/RecordTable";
 import { Info } from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
 

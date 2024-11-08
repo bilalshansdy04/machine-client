@@ -7,11 +7,26 @@ interface SearchProps {
   onSearchSubmit: () => void;
 }
 
-export default function Search({ searchTerm, onSearchChange, onSearchSubmit }: SearchProps) {
+export default function Search({
+  searchTerm,
+  onSearchChange,
+  onSearchSubmit,
+}: SearchProps) {
   return (
-    <div className="flex w-full max-w-sm items-center space-x-2 mb-3 pl-5" id="search-record">
-      <Input type="text" placeholder="Search" value={searchTerm} onChange={onSearchChange} />
-      <Button onClick={onSearchSubmit} className="bg-Quaternary text-white hover:bg-abyssKnight">
+    <div
+      className="flex items-center space-x-2 mb-3 mt-3"
+      id="search-record"
+    >
+      <Input
+        type="text"
+        placeholder="Search"
+        value={searchTerm}
+        onChange={onSearchChange}
+      />
+      <Button
+        onClick={onSearchSubmit}
+        className="bg-Quaternary text-white hover:bg-abyssKnight"
+      >
         Search
       </Button>
     </div>

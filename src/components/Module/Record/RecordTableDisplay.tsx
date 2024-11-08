@@ -1,20 +1,24 @@
 // src/component/Module/Record/RecordTableDisplay.tsx
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-  } from "@/components/ui/table";
-  
-  interface RecordTableDisplayProps {
-    data: any[];
-    startIndex: number;
-  }
-  
-  export default function RecordTableDisplay({ data, startIndex }: RecordTableDisplayProps) {
-    return (
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+interface RecordTableDisplayProps {
+  data: any[];
+  startIndex: number;
+}
+
+export default function RecordTableDisplay({
+  data,
+  startIndex,
+}: RecordTableDisplayProps) {
+  return (
+    <div id="table-record">
       <Table>
         <TableHeader>
           <TableRow>
@@ -51,6 +55,6 @@ import {
           ))}
         </TableBody>
       </Table>
-    );
-  }
-  
+    </div>
+  );
+}
