@@ -1,8 +1,8 @@
-import Chart from "@/components/dashboard-component/Chart";
-import Maps from "@/components/dashboard-component/Maps";
-import ProductivityTable from "@/components/dashboard-component/ProductivityTable";
-import RecordTable from "@/components/dashboard-component/RecordTable";
-import { Info  } from "@phosphor-icons/react";
+import Chart from "@/components/Module/Chart";
+import Maps from "@/components/Module/Maps";
+import ProductivityTable from "@/components/Module/ProductivityTable";
+import RecordTable from "@/components/Module/RecordTable";
+import { Info } from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
 
 export default function Dashboard() {
@@ -44,7 +44,7 @@ export default function Dashboard() {
         <Link to="/guide">
           <div className="relative group">
             <div className="bg-Tertiary text-Secondary rounded-full w-12 h-12 flex items-center justify-center transition-all duration-300 group-hover:w-32 hover:rounded-full shadow-lg overflow-hidden">
-              <Info 
+              <Info
                 size={32}
                 className="transition-transform duration-300 group-hover:mr-2"
               />

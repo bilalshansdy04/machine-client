@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MachineProductivity } from "../../pages/Dashboard";
+import { MachineProductivity } from "../../../utils/interface/interface.ts";
 
 interface FilterDropdownsProps {
   uniqueValues: {
@@ -121,7 +121,7 @@ export const FilterDropdowns: React.FC<FilterDropdownsProps> = ({
               </DropdownMenuRadioItem>
 
               {uniqueValues[field as keyof typeof uniqueValues]
-                .filter((val) => !val.toLowerCase().includes("all")) // Pastikan tidak ada "All" di sini
+                .filter((val) => !val.toLowerCase().includes("all"))
                 .map((val) => (
                   <DropdownMenuRadioItem key={val} value={val}>
                     {val}

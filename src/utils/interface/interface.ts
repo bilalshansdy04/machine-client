@@ -29,10 +29,10 @@ export interface MachineId {
     objectgroup: string;
     objectid: string;
     objectcode: string;
-    outputcapacity: number;
+    outputcapacity: string;
     outputuom: string;
     outputtime: string;
-    outputcost: number;
+    outputcost: string;
     startdate: string;
     enddate: string;
     objectstatus: string;
