@@ -1,20 +1,23 @@
-import { useState,  useMemo } from "react";
-import useWebSocket from "../../hooks/useWebSocket.ts";
-import { SearchBar } from "../productivity-component/SearchBar";
-import { ConvertToPDFButton } from "../productivity-component/ConvertToPDFButton";
-import ProductivityTableDisplay from "../productivity-component/ProductivityTableDisplay";
-import { FilterDropdowns } from "./FilterDropdowns";
+import { useState, useMemo } from "react";
+import useWebSocket from "../../../utils/useWebSocket.ts";
+import { SearchBar } from "../Productivity/SearchBar.tsx";
+import { ConvertToPDFButton } from "../Productivity/ConvertToPDFButton.tsx";
+import ProductivityTableDisplay from "../Productivity/ProductivityTableDisplay.tsx";
+import { FilterDropdowns } from "../Productivity/FilterDropdowns.tsx";
 import { MachineProductivity } from "@/utils/interface/interface";
 import { fieldLabels, getUniqueValues } from "@/utils/helpers";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { grid } from "ldrs";
+import Title from "../Productivity/Title.tsx";
 
 grid.register();
 
 export default function ProductivityTable() {
   const [currentPage, setCurrentPage] = useState(1);
-  const { productivityData, loading } = useWebSocket(import.meta.env.VITE_URL_SOCKET);
+  const { productivityData, loading } = useWebSocket(
+    import.meta.env.VITE_URL_SOCKET
+  );
   const itemsPerPage = 3;
   const [confirmedSearchTerm, setConfirmedSearchTerm] = useState("");
   const [selectedFilters, setSelectedFilters] = useState<
@@ -23,15 +26,27 @@ export default function ProductivityTable() {
 
   const uniqueValues = useMemo(
     () => ({
-      objecttype: ["All Types", ...getUniqueValues(productivityData, "objecttype")],
+      objecttype: [
+        "All Types",
+        ...getUniqueValues(productivityData, "objecttype"),
+      ],
       objectid: ["All IDs", ...getUniqueValues(productivityData, "objectid")],
-      objectgroup: ["All Groups", ...getUniqueValues(productivityData, "objectgroup")],
-      objectcode: ["All Codes", ...getUniqueValues(productivityData, "objectcode")],
+      objectgroup: [
+        "All Groups",
+        ...getUniqueValues(productivityData, "objectgroup"),
+      ],
+      objectcode: [
+        "All Codes",
+        ...getUniqueValues(productivityData, "objectcode"),
+      ],
       outputcapacity: [
         "All Capacities",
         ...getUniqueValues(productivityData, "outputcapacity"),
       ],
-      startdate: ["All Dates", ...getUniqueValues(productivityData, "startdate")],
+      startdate: [
+        "All Dates",
+        ...getUniqueValues(productivityData, "startdate"),
+      ],
     }),
     [productivityData]
   );
@@ -86,38 +101,48 @@ export default function ProductivityTable() {
         <>
           <div className="space-y-5">
             <div className="flex justify-between">
-              <h1 className="font-bold text-xl">Productivity Table</h1>
-              <SearchBar onSearch={(term) => setConfirmedSearchTerm(term)} />
-              <ConvertToPDFButton
-                data={filteredAndSearchedData}
-                itemsPerPage={itemsPerPage}
+              <div>
+                <Title />
+              </div>
+              <div id="search-productivity">
+                <SearchBar onSearch={(term) => setConfirmedSearchTerm(term)} />
+              </div>
+              <div id="export-productivity">
+                <ConvertToPDFButton
+                  data={filteredAndSearchedData}
+                  itemsPerPage={itemsPerPage}
+                />
+              </div>
+            </div>
+
+            <div id="filter-button">
+              <FilterDropdowns
+                uniqueValues={uniqueValues}
+                selectedFilters={selectedFilters}
+                handleFilterChange={(filter, value) => {
+                  setSelectedFilters((prevFilters) => ({
+                    ...prevFilters,
+                    [filter]: value,
+                  }));
+                }}
+                fieldLabels={fieldLabels}
               />
             </div>
 
-            <FilterDropdowns
-              uniqueValues={uniqueValues}
-              selectedFilters={selectedFilters}
-              handleFilterChange={(filter, value) => {
-                setSelectedFilters((prevFilters) => ({
-                  ...prevFilters,
-                  [filter]: value,
-                }));
-              }}
-              fieldLabels={fieldLabels}
-            />
-
-            <ProductivityTableDisplay
-              data={currentData}
-              indexOfFirstItem={indexOfFirstItem || 0}
-              currentPage={currentPage}
-              itemsPerPage={itemsPerPage}
-              onPageChange={(page) => setCurrentPage(page)}
-              renderNoColumn={(index) =>
-                (indexOfFirstItem + index + 1).toString()
-              }
-            />
+            <div id="table-productivity">
+              <ProductivityTableDisplay
+                data={currentData}
+                indexOfFirstItem={indexOfFirstItem || 0}
+                currentPage={currentPage}
+                itemsPerPage={itemsPerPage}
+                onPageChange={(page) => setCurrentPage(page)}
+                renderNoColumn={(index) =>
+                  (indexOfFirstItem + index + 1).toString()
+                }
+              />
+            </div>
           </div>
-          
+
           {/* Stack Pagination */}
           <div
             className="flex justify-center w-full"
@@ -125,7 +150,7 @@ export default function ProductivityTable() {
           >
             <Stack spacing={2} className="items-center mt-2">
               <Pagination
-                count={Math.ceil(filteredAndSearchedData.length / itemsPerPage)} // Dynamic count based on filtered data
+                count={Math.ceil(filteredAndSearchedData.length / itemsPerPage)}
                 page={currentPage}
                 onChange={(_e, page) => setCurrentPage(page)}
                 shape="rounded"

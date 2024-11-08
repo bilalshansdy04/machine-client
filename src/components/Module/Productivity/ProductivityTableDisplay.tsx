@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { MachineProductivity } from "../../utils/interface/interface";
+import { MachineProductivity } from "../../../utils/interface/interface";
 
 interface ProductivityTableDisplayProps {
   data: MachineProductivity[];
@@ -40,9 +40,7 @@ export default function ProductivityTableDisplay({
       <TableBody>
         {data.map((productivity, index) => (
           <TableRow key={productivity.id}>
-            <TableCell>
-              {indexOfFirstItem + index + 1}
-            </TableCell>
+            <TableCell>{indexOfFirstItem + index + 1}</TableCell>
             <TableCell>{productivity.objecttype.trim()}</TableCell>
             <TableCell>{productivity.objectid.trim()}</TableCell>
             <TableCell>{productivity.objectgroup.trim()}</TableCell>

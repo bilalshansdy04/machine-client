@@ -13,19 +13,18 @@ import Stack from "@mui/material/Stack";
 
 import { grid } from "ldrs";
 
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
+import { Input } from "../../ui/input.tsx";
+import { Button } from "../../ui/button.tsx";
 
-import { exportTableToPDF } from "../../utils/convertToPDF.ts";
+import { exportTableToPDF } from "../../../utils/convertToPDF.ts";
 
 import { Question } from "@phosphor-icons/react";
 
 import { startTourRecord } from "@/utils/guide/guide-record.ts";
 
-import useWebSocket from "../../hooks/useWebSocket.ts";
+import useWebSocket from "../../../utils/useWebSocket.ts";
 
 grid.register();
-
 
 export default function RecordTable() {
   const { recordData, loading } = useWebSocket(import.meta.env.VITE_URL_SOCKET);
@@ -77,7 +76,6 @@ export default function RecordTable() {
       )
       .sort((a, b) => a.recorddate.localeCompare(b.recorddate));
   }, [recordData, confirmedSearchTerm]);
-  
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -97,8 +95,6 @@ export default function RecordTable() {
     []
   );
 
- 
-
   return (
     <div className="flex flex-col min-h-[32rem] justify-between">
       <div>
@@ -116,7 +112,10 @@ export default function RecordTable() {
                   className="cursor-pointer"
                 />
               </div>
-              <h2 className="font-normal text-lg text-slate-500" id="sub-title-record">
+              <h2
+                className="font-normal text-lg text-slate-500"
+                id="sub-title-record"
+              >
                 Overview of Machine Records
               </h2>
             </div>
@@ -251,7 +250,8 @@ export default function RecordTable() {
                         <TableCell>{record.recordnotes}</TableCell>
                         <TableCell>{record.recordstatus}</TableCell>
                       </TableRow>
-                    ))};;
+                    ))}
+                    ;;
                   </TableBody>
                 </Table>
               </div>

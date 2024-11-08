@@ -7,17 +7,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { blueIcon, redIcon, starIcon } from "../map-ui/MapIcons.ts";
+import { blueIcon, redIcon, starIcon } from "../Maps/MapIcons.ts";
 import "leaflet/dist/leaflet.css";
 import { Question } from "@phosphor-icons/react";
 import { startTourMaps } from "@/utils/guide/guide-maps.ts";
-import useWebSocket from "../../hooks/useWebSocket.ts";
+import useWebSocket from "../../../utils/useWebSocket.ts";
 
 export default function Maps() {
   const { idData, loading } = useWebSocket(import.meta.env.VITE_URL_SOCKET);
   const { productivityData } = useWebSocket(import.meta.env.VITE_URL_SOCKET);
   const { profileData } = useWebSocket(import.meta.env.VITE_URL_SOCKET);
-
 
   const getLatestOutputCapacity = (objectId: string) => {
     const relevantData = productivityData
@@ -86,7 +85,7 @@ export default function Maps() {
     });
 
     const totalCapacity = Object.values(latestCapacities).reduce(
-      (sum, record) => sum + record.outputcapacity, 
+      (sum, record) => sum + record.outputcapacity,
       0
     );
     return Object.keys(latestCapacities).length > 0
