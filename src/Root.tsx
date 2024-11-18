@@ -23,17 +23,19 @@ const Root = () => {
 
   return (
     <div>
-      <Navbar />
-      <div
-        className={`${
-          location.pathname === "/guide"
-            ? "px-0 pt-0 pb-0 bg-white"
-            : "px-36 pt-10 pb-20 bg-Primary"
-        }`}
-      >
-        <Outlet />
+      <div className="hidden lg:block">
+        <Navbar />
+        <div
+          className={`${
+            location.pathname === "/guide"
+              ? "px-0 pt-0 pb-0 bg-white"
+              : "px-36 pt-10 pb-20 bg-Primary"
+          }`}
+        >
+          <Outlet />
+        </div>
+        <Footer />
       </div>
-      <Footer />
     </div>
   );
 };
