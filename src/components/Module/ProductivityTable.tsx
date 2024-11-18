@@ -93,7 +93,7 @@ export default function ProductivityTable() {
 
   return (
     <div className="flex flex-col min-h-[29rem] justify-between">
-      {loading || productivityData.length === 0 ? (
+      {loading || productivityData.length == 0 ? (
         <div className="w-full h-full flex items-center justify-center mt-36">
           <l-grid size="150" speed="1.5" color="#0b60b0"></l-grid>
         </div>
