@@ -2,6 +2,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { useEffect } from "react";
+import Mobile from "./Mobile";
 
 const Root = () => {
   const location = useLocation();
@@ -35,6 +36,9 @@ const Root = () => {
           <Outlet />
         </div>
         <Footer />
+      </div>
+      <div className="block lg:hidden">
+        <Mobile />
       </div>
     </div>
   );

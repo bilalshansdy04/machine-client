@@ -1,6 +1,5 @@
 import * as React from "react";
-import useWebSocket from "../../utils/useWebSocket.ts";
-import Title from "./Chart/Title.tsx";
+import useWebSocket from "../utils/useWebSocket.ts";
 import Dropdowns from "./Chart/Dropdowns.tsx";
 import ChartDisplay from "./Chart/ChartDisplay.tsx";
 
@@ -42,11 +41,9 @@ export default function Chart() {
       color: "#394867",
     },
   };
-
   return (
-    <div className="w-full h-full relative">
-      <div className="flex gap-6 justify-between mb-5">
-        <Title />
+    <div>
+      <div className="w-full flex items-center justify-center mt-20">
         <Dropdowns
           selectedObjectCode={selectedObjectCode}
           setSelectedObjectCode={setSelectedObjectCode}
@@ -55,11 +52,13 @@ export default function Chart() {
           objectCodes={objectCodes}
         />
       </div>
-      <ChartDisplay
-        chartConfig={chartConfig}
-        filteredData={filteredData}
-        selectedObjectCode={selectedObjectCode}
-      />
+      <div className="pr-5 pb-5 mt-14">
+        <ChartDisplay
+          chartConfig={chartConfig}
+          filteredData={filteredData}
+          selectedObjectCode={selectedObjectCode}
+        />
+      </div>
     </div>
   );
 }
