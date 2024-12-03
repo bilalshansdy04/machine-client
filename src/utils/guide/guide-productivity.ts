@@ -2,6 +2,7 @@ import Shepherd from "shepherd.js";
 import "shepherd.js/dist/css/shepherd.css";
 import "../../style/shepherd-theme-custom.css";
 
+
 export const startTourProductivity = () => {
   if (Shepherd.activeTour) {
     Shepherd.activeTour.complete();

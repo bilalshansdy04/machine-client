@@ -24,6 +24,9 @@ export default function ProductivityTable() {
     Partial<Record<keyof MachineProductivity, string>>
   >({});
 
+  console.log("Productivity Data:", productivityData);
+
+
   const uniqueValues = useMemo(
     () => ({
       objecttype: [
@@ -43,6 +46,8 @@ export default function ProductivityTable() {
         "All Capacities",
         ...getUniqueValues(productivityData, "outputcapacity"),
       ],
+      outputuom: [], // Kosongkan karena tidak diinginkan
+      id: [], // Kosongkan karena tidak diinginkan
       startdate: [
         "All Dates",
         ...getUniqueValues(productivityData, "startdate"),
@@ -162,3 +167,5 @@ export default function ProductivityTable() {
     </div>
   );
 }
+
+
