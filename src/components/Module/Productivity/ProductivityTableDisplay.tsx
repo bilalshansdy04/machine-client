@@ -13,7 +13,12 @@ import { MachineProductivity } from "../../../utils/interface/interface";
 interface ProductivityTableDisplayProps {
   data: MachineProductivity[];
   indexOfFirstItem: number;
+  currentPage: number;
+  itemsPerPage: number;
+  onPageChange: (page: number) => void; 
+  renderNoColumn: (index: number) => React.ReactNode; 
 }
+
 
 export default function ProductivityTableDisplay({
   data,

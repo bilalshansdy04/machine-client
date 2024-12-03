@@ -4,6 +4,7 @@ import { MachineProductivity, MachineRecord } from "../utils/interface/interface
 
 type ExportType = "productivity" | "record";
 
+
 export const exportTableToPDF = (
   dataToExport: MachineProductivity[] | MachineRecord[],
   startPage: number,
@@ -45,7 +46,7 @@ export const exportTableToPDF = (
         item.objectid,
         item.objectgroup,
         item.objectcode,
-        Math.round(item.outputcapacity),
+        Math.round(parseFloat(item.outputcapacity)),
         item.outputuom,
         item.outputtime,
         parseFloat(item.outputcost).toFixed(0),
@@ -94,6 +95,7 @@ export const exportTableToPDF = (
       tableRows.push(rowData);
     });
   }
+  
 
   // Membuat tabel di PDF
   doc.autoTable({
@@ -149,3 +151,5 @@ export const exportTableToPDF = (
     type === "productivity" ? "productivity_table.pdf" : "record_table.pdf"
   );
 };
+
+

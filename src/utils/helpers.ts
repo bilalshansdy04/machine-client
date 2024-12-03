@@ -1,27 +1,25 @@
 import { MachineProductivity } from "./interface/interface.ts";
 
-export const fieldLabels = {
-  objecttype: "Object Types",
-  objectid: "Object IDs",
-  objectgroup: "Object Groups",
-  objectcode: "Object Codes",
-  outputcapacity: "Capacities",
-  startdate: "Dates",
+export const fieldLabels: Record<keyof MachineProductivity, string> = {
+  id: "ID",
+  objecttype: "Object Type",
+  objectgroup: "Object Group",
+  objectid: "Object ID",
+  objectcode: "Object Code",
+  outputcapacity: "Output Capacity",
+  outputuom: "Output UOM",
+  startdate: "Start Date",
+  enddate: "End Date",
+  outputcost: "Output Cost",
+  outputtime: "Output Time",
+  objectstatus: "Object Status",
 };
 
-export function getUniqueValues(
-  data: MachineProductivity[],
-  field: keyof MachineProductivity
-) {
-  // Memastikan bahwa `outputcapacity` hanya menampilkan angka tanpa desimal yang tidak perlu
-  const values = data.map((item) => {
-    if (field === "outputcapacity") {
-      const parsedValue = parseFloat(item[field]);
-      return !isNaN(parsedValue) ? parsedValue.toString() : item[field];
-    }
-    return item[field];
-  });
-
-  // Menghilangkan duplikat setelah parsing angka
-  return [...new Set(values)];
+export function getUniqueValues<T>(data: T[], field: keyof T): string[] {
+  const uniqueSet = new Set(
+    data
+      .map((item) => String(item[field] ?? ""))
+      .filter((val) => val.trim() !== "")
+  );
+  return Array.from(uniqueSet);
 }

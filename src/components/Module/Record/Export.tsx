@@ -2,10 +2,13 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { exportTableToPDF } from "@/utils/convertToPDF";
-import { MachineProductivity } from "@/utils/interface/interface";
+import {
+  MachineProductivity,
+  MachineRecord,
+} from "@/utils/interface/interface";
 
 interface ConvertToPDFButtonProps {
-  data: MachineProductivity[];
+  data: MachineProductivity[] | MachineRecord[];
   itemsPerPage: number;
 }
 
@@ -39,7 +42,7 @@ export default function ConvertToPDFButton({
     const endPageNumber = endPage !== "" ? (endPage as number) : 0;
 
     exportTableToPDF(
-      data,
+      data as MachineRecord[],
       startPageNumber,
       endPageNumber,
       itemsPerPage,

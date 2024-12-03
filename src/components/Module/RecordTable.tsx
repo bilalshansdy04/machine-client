@@ -26,9 +26,10 @@ export default function RecordTable() {
   }, [recordData, confirmedSearchTerm]);
 
   const handleSearchChange = useCallback(
-    (event) => setSearchTerm(event.target.value),
+    (event: React.ChangeEvent<HTMLInputElement>) =>
+      setSearchTerm(event.target.value),
     []
-  );
+  );  
 
   const handleSearchSubmit = useCallback(() => {
     setConfirmedSearchTerm(searchTerm);
