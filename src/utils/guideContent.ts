@@ -1,6 +1,9 @@
 export const guideContent = `
 <div class="prose lg:prose-xl justify">
   <h1>Panduan Pengguna Website Dashboard</h1>
+  <p>
+    Dashboard real-time yang dikembangkan berfungsi sebagai alat untuk mendukung pengelolaan data pemeliharaan mesin secara efisien dan terintegrasi. Sistem ini dirancang menggunakan teknologi React dan Socket.IO, dengan dukungan protokol Pyxis serta enkripsi AES-256 untuk memastikan keamanan data. Dashboard mencakup fitur utama seperti tabel produktivitas, tabel catatan operasional, visualisasi data dalam bentuk grafik, dan peta interaktif untuk persebaran mesin berdasarkan data lokasi. Dengan fitur-fitur ini, pengguna dapat memantau performa operasional mesin secara real-time, menganalisis data dengan mudah, dan mengoptimalkan pengambilan keputusan berbasis informasi terkini.
+  </p>
 
   <h2>1. Navigasi di Website</h2>
   <h3>1.1 Navbar (Navigasi)</h3>

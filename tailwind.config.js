@@ -6,7 +6,7 @@ module.exports = {
     "./components/**/*.{ts,tsx}",
     "./app/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx}",
-    'node_modules/flowbite-react/lib/esm/**/*.js',
+    "node_modules/flowbite-react/lib/esm/**/*.js",
   ],
   prefix: "",
   theme: {
@@ -22,15 +22,15 @@ module.exports = {
         sans: ['"Kanit", sans-serif'],
       },
       colors: {
-        Primary:  '#a5d8e5',
-        Secondary : '#e3f6f5 ',
-        Tertiary  : '#0b60b0',
-        Quaternary  : '#394867',
+        Primary: "#a5d8e5",
+        Secondary: "#e3f6f5 ",
+        Tertiary: "#0b60b0",
+        Quaternary: "#394867",
 
-        HoverPrimary:  '#6ab5c8',
-        HoverSecondary : '#b9e3e2',
-        HoverTertiary  : '#0a549d',
-        HoverQuaternary  : '#2f3b56',
+        HoverPrimary: "#6ab5c8",
+        HoverSecondary: "#b9e3e2",
+        HoverTertiary: "#0a549d",
+        HoverQuaternary: "#2f3b56",
 
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -85,7 +85,20 @@ module.exports = {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
+      typography: (theme) => ({
+        DEFAULT: {
+          css: {
+            p: {
+              textAlign: "justify",
+            },
+          },
+        },
+      }),
     },
   },
-  plugins: [require("tailwindcss-animate"), require("flowbite/plugin"), require('@tailwindcss/typography'),],
+  plugins: [
+    require("tailwindcss-animate"),
+    require("flowbite/plugin"),
+    require("@tailwindcss/typography"),
+  ],
 };
