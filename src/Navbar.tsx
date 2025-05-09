@@ -32,30 +32,14 @@ export default function Navbar() {
           {location.pathname === "/guide" ? (
             <div className="flex items-center">
               <h1 className="text-4xl font-bold text-Tertiary drop-shadow-xl">
-                Dash<span className="text-Quaternary">board</span>
+                Dashboard
               </h1>
-              {/* <div className="w-24">
-                <DotLottieReact
-                  src="https://lottie.host/b13a4b33-c45c-49a0-9eda-e5026e48418d/oRSXnTjKMV.json"
-                  backgroundColor="transparent"
-                  loop
-                  autoplay
-                />
-              </div> */}
             </div>
           ) : (
             <a href="/" className="flex items-center">
               <h1 className="text-4xl font-bold text-Tertiary drop-shadow-xl">
-                Dash<span className="text-Quaternary">board</span>
+                Dashboard
               </h1>
-              {/* <div className="w-24">
-                <DotLottieReact
-                  src="https://lottie.host/b13a4b33-c45c-49a0-9eda-e5026e48418d/oRSXnTjKMV.json"
-                  backgroundColor="transparent"
-                  loop
-                  autoplay
-                />
-              </div> */}
             </a>
           )}
           {location.pathname !== "/guide" && (
