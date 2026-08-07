@@ -18,7 +18,7 @@ export function SearchBar({ onSearch }: SearchBarProps) {
   };
 
   return (
-    <div className="flex items-center space-x-2 mb-3">
+    <div className="flex items-center space-x-2">
       <Input
         type="text"
         placeholder="Search"

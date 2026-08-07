@@ -10,7 +10,7 @@ export default function Dashboard() {
     <div className="flex flex-col gap-10">
       <section>
         <div
-          className="w-full h-[33rem] rounded-xl bg-Secondary px-10 pt-10 pb-16 shadow scroll-mt-20"
+          className="w-full min-h-[33rem] md:rounded-xl bg-transparent md:bg-Secondary px-0 md:px-10 pt-10 pb-16 md:shadow scroll-mt-20"
           id="chart"
         >
           <Chart />
@@ -18,7 +18,7 @@ export default function Dashboard() {
       </section>
       <section>
         <div
-          className="w-full h-[33rem] rounded-xl bg-Secondary px-10 pt-10 pb-16 shadow scroll-mt-36"
+          className="w-full min-h-[33rem] md:rounded-xl bg-transparent md:bg-Secondary px-0 md:px-10 pt-10 pb-16 md:shadow scroll-mt-36"
           id="productivity"
         >
           <ProductivityTable />
@@ -26,7 +26,7 @@ export default function Dashboard() {
       </section>
       <section>
         <div
-          className="w-full h-[37rem] rounded-xl bg-Secondary px-10 pt-10 pb-16 shadow scroll-mt-36"
+          className="w-full min-h-[37rem] md:rounded-xl bg-transparent md:bg-Secondary px-0 md:px-10 pt-10 pb-16 md:shadow scroll-mt-36"
           id="record"
         >
           <RecordTable />
@@ -34,7 +34,7 @@ export default function Dashboard() {
       </section>
       <section>
         <div
-          className="w-full h-[34rem] rounded-xl bg-Secondary px-10 pt-10 pb-16 shadow scroll-mt-28"
+          className="w-full min-h-[34rem] md:rounded-xl bg-transparent md:bg-Secondary px-0 md:px-10 pt-10 pb-16 md:shadow scroll-mt-28"
           id="maps"
         >
           <Maps />

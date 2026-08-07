@@ -46,7 +46,7 @@ export default function Chart() {
 
   return (
     <div className="w-full h-full relative">
-      <div className="flex gap-6 justify-between mb-5">
+      <div className="flex flex-col md:flex-row gap-4 md:gap-6 justify-between mb-5">
         <Title />
         <Dropdowns
           selectedObjectCode={selectedObjectCode}

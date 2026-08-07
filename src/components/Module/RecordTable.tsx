@@ -64,9 +64,11 @@ export default function RecordTable() {
       ) : (
         <>
           <div className="space-y-5">
-            <div className="flex justify-between">
-              <Title />
-              <div className="space-x-5 flex items-center justify-center h-full">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0">
+              <div className="w-full md:w-auto">
+                <Title />
+              </div>
+              <div className="flex flex-wrap items-center gap-3 md:gap-5 w-full md:w-auto justify-start md:justify-end">
                 <Search
                   searchTerm={searchTerm}
                   onSearchChange={handleSearchChange}

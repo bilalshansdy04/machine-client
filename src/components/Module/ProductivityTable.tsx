@@ -105,33 +105,34 @@ export default function ProductivityTable() {
       ) : (
         <>
           <div className="space-y-5">
-            <div className="flex justify-between">
-              <div>
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0">
+              <div className="w-full md:w-auto">
                 <Title />
               </div>
-              <div id="search-productivity">
-                <SearchBar onSearch={(term) => setConfirmedSearchTerm(term)} />
+              <div className="flex flex-wrap items-center gap-3 md:gap-5 w-full md:w-auto justify-start md:justify-end">
+                <div id="search-productivity">
+                  <SearchBar onSearch={(term) => setConfirmedSearchTerm(term)} />
+                </div>
+                <div id="export-productivity">
+                  <ConvertToPDFButton
+                    data={filteredAndSearchedData}
+                    itemsPerPage={itemsPerPage}
+                  />
+                </div>
+                <div id="filter-button">
+                  <FilterDropdowns
+                    uniqueValues={uniqueValues}
+                    selectedFilters={selectedFilters}
+                    handleFilterChange={(filter, value) => {
+                      setSelectedFilters((prevFilters) => ({
+                        ...prevFilters,
+                        [filter]: value,
+                      }));
+                    }}
+                    fieldLabels={fieldLabels}
+                  />
+                </div>
               </div>
-              <div id="export-productivity">
-                <ConvertToPDFButton
-                  data={filteredAndSearchedData}
-                  itemsPerPage={itemsPerPage}
-                />
-              </div>
-            </div>
-
-            <div id="filter-button">
-              <FilterDropdowns
-                uniqueValues={uniqueValues}
-                selectedFilters={selectedFilters}
-                handleFilterChange={(filter, value) => {
-                  setSelectedFilters((prevFilters) => ({
-                    ...prevFilters,
-                    [filter]: value,
-                  }));
-                }}
-                fieldLabels={fieldLabels}
-              />
             </div>
 
             <div id="table-productivity">

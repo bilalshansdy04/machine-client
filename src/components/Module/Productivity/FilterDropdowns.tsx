@@ -42,7 +42,7 @@ export const FilterDropdowns: React.FC<FilterDropdownsProps> = ({
   );
 
   return (
-    <div className="flex flex-col gap-4 mb-7 items-start w-full">
+    <div className="flex flex-col gap-4 items-start w-full">
       <div className="flex gap-4 items-center flex-wrap w-full">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

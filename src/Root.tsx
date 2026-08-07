@@ -28,7 +28,7 @@ const Root = () => {
         className={`${
           location.pathname === "/guide"
             ? "px-0 pt-0 pb-0 bg-white"
-            : "px-36 pt-10 pb-20 bg-Primary"
+            : "px-4 md:px-36 pt-10 pb-20 bg-white md:bg-Primary"
         }`}
       >
         <Outlet />

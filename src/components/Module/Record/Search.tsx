@@ -14,7 +14,7 @@ export default function Search({
 }: SearchProps) {
   return (
     <div
-      className="flex items-center space-x-2 mb-3 mt-3"
+      className="flex items-center space-x-2"
       id="search-record"
     >
       <Input
