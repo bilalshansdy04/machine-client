@@ -10,9 +10,10 @@ export default defineConfig({
     },
   },
   server: {
+    port: 5174,
     proxy: {
       '/api': {
-        target: 'http://103.119.54.76:8989',
+        target: 'http://localhost:3001',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '/JPxDataClass'),
       },

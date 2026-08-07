@@ -13,10 +13,10 @@ const useWebSocket = (url: string) => {
     const socket: Socket = io(url, { transports: ["websocket"] });
     socket.on("data_update", (newData) => {
       if (newData) {
-        setIdData(newData.id);
-        setProfileData(newData.profile);
-        setProductivityData(newData.productivity);
-        setRecordData(newData.record);
+        setIdData(newData.id || []);
+        setProfileData(newData.profile || []);
+        setProductivityData(newData.productivity || []);
+        setRecordData(newData.record || []);
         setLoading(false);
       } else {
         console.error("Data productivity tidak ditemukan");
